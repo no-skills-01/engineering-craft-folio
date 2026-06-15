@@ -42,7 +42,6 @@ const stagger: Variants = {
 /* ============================================================ */
 function Nav() {
   const links = [
-    { label: "About", href: "#about" },
     { label: "Domains", href: "#domains" },
     { label: "Projects", href: "#projects" },
     { label: "Stack", href: "#stack" },
