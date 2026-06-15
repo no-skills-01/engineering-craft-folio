@@ -97,117 +97,136 @@ function Hero() {
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.3]);
 
   return (
-    <section id="top" ref={ref} className="relative isolate overflow-hidden pt-36 pb-24 sm:pt-44 sm:pb-32 grain">
-      {/* Atmospheric layers */}
-      <motion.div
-        style={{ y, opacity }}
-        aria-hidden
-        className="absolute inset-0 -z-10"
-      >
+    <section id="top" ref={ref} className="relative isolate overflow-hidden pt-32 pb-20 sm:pt-40 sm:pb-24 grain">
+      {/* Atmospheric layers — cloud-engineering blue */}
+      <motion.div style={{ y, opacity }} aria-hidden className="absolute inset-0 -z-10">
+        <div className="absolute inset-0 grid-pattern opacity-60" />
         <div className="absolute left-1/2 top-0 h-[640px] w-[1200px] -translate-x-1/2 amber-glow" />
         <div className="absolute left-1/2 top-40 h-[1px] w-[80%] -translate-x-1/2 bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
-        <div className="absolute -left-40 top-60 h-96 w-96 rounded-full bg-primary/10 blur-[120px]" />
-        <div className="absolute right-0 top-80 h-96 w-96 rounded-full bg-primary/5 blur-[140px]" />
+        <div className="absolute -left-40 top-40 h-[28rem] w-[28rem] rounded-full bg-primary/15 blur-[140px]" />
+        <div className="absolute -right-32 top-72 h-[26rem] w-[26rem] rounded-full bg-accent/10 blur-[160px]" />
       </motion.div>
 
       <div className="mx-auto max-w-6xl px-6">
-        <motion.div variants={stagger} initial="hidden" animate="show" className="flex flex-col items-start gap-8">
-          {/* eyebrow */}
-          <motion.div variants={fade} className="flex items-center gap-3 rounded-full hairline bg-surface/60 px-3 py-1.5 backdrop-blur">
-            <span className="relative grid h-2 w-2 place-items-center">
-              <span className="absolute h-2 w-2 animate-ping rounded-full bg-primary/60" />
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            </span>
-            <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-              Available for cloud & platform roles
-            </span>
+        <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-[1.35fr_1fr] lg:gap-16">
+          {/* LEFT — content */}
+          <motion.div variants={stagger} initial="hidden" animate="show" className="flex flex-col items-start gap-7">
+            <motion.div variants={fade} className="flex items-center gap-3 rounded-full hairline bg-surface/60 px-3 py-1.5 backdrop-blur">
+              <span className="relative grid h-2 w-2 place-items-center">
+                <span className="absolute h-2 w-2 animate-ping rounded-full bg-primary/60" />
+                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              </span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                Available for cloud & platform roles
+              </span>
+            </motion.div>
+
+            <motion.h1
+              variants={fade}
+              className="font-display text-balance text-[clamp(2.4rem,6.2vw,4.6rem)] font-semibold leading-[1.02] tracking-tight"
+            >
+              Darshan Atkari
+            </motion.h1>
+
+            <motion.p
+              variants={fade}
+              className="-mt-2 font-mono text-[clamp(0.78rem,1.05vw,0.95rem)] uppercase tracking-[0.28em] text-muted-foreground"
+            >
+              <span className="text-primary">Cloud</span> · DevOps · <span className="text-primary">Platform</span> Engineer
+            </motion.p>
+
+            <motion.p variants={fade} className="max-w-xl font-display text-2xl italic leading-snug text-foreground/90 sm:text-[1.6rem]">
+              Automating the present. <span className="text-primary not-italic font-normal">·</span> Scaling the future.
+            </motion.p>
+
+            <motion.p variants={fade} className="max-w-xl text-balance text-base leading-relaxed text-muted-foreground sm:text-lg">
+              I design and ship the unseen layer beneath modern software — production-inspired
+              cloud platforms, IaC, DevSecOps pipelines, Kubernetes and MLOps systems built with
+              the discipline of platform engineering: golden paths, secure defaults, and developer
+              experience as a first-class product surface.
+            </motion.p>
+
+            <motion.div variants={fade} className="flex flex-wrap items-center gap-3 pt-1">
+              <a
+                href="#projects"
+                className="group inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-[0_10px_40px_-10px_oklch(0.7_0.18_240/_60%)] transition hover:brightness-110"
+              >
+                View Projects
+                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+              </a>
+              <a
+                href="https://github.com/darshanatkari"
+                target="_blank"
+                rel="noreferrer"
+                className="group inline-flex items-center gap-2 rounded-full hairline bg-surface px-5 py-3 text-sm font-medium text-foreground transition hover:bg-surface-elevated"
+              >
+                <Github className="h-4 w-4" />
+                GitHub
+              </a>
+              <a
+                href="#resume"
+                className="group inline-flex items-center gap-2 rounded-full bg-transparent px-5 py-3 text-sm font-medium text-muted-foreground transition hover:text-foreground"
+              >
+                <FileText className="h-4 w-4" />
+                Resume
+                <ArrowUpRight className="h-3.5 w-3.5 opacity-60 transition group-hover:opacity-100" />
+              </a>
+            </motion.div>
           </motion.div>
 
-          {/* headline */}
-          <motion.h1
-            variants={fade}
-            className="font-display text-balance text-[clamp(2.6rem,7vw,5.6rem)] font-semibold leading-[0.95] tracking-tight"
+          {/* RIGHT — portrait */}
+          <motion.div
+            initial={{ opacity: 0, y: 24, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+            className="relative mx-auto w-full max-w-md lg:mx-0 lg:mt-2"
           >
-            Darshan Atkari.
-            <br />
-            <span className="text-muted-foreground">Cloud · DevOps · Platform</span>
-            <br />
-            <span className="bg-gradient-to-br from-primary via-primary to-foreground bg-clip-text text-transparent">
-              Engineer.
-            </span>
-          </motion.h1>
+            {/* soft glow */}
+            <div aria-hidden className="absolute -inset-8 -z-10 rounded-[2.5rem] bg-primary/25 blur-3xl" />
+            <div aria-hidden className="absolute -inset-1 -z-10 rounded-[2rem] bg-gradient-to-br from-primary/40 via-accent/20 to-transparent blur-md" />
 
-          <motion.p variants={fade} className="max-w-2xl text-balance text-lg text-muted-foreground sm:text-xl">
-            <span className="font-display italic text-foreground/90">Automating the present.</span>{" "}
-            <span className="font-display italic text-foreground/90">Scaling the future.</span>
-            <br className="hidden sm:block" />
-            Building production-inspired cloud platforms, automation systems, DevSecOps pipelines and
-            cloud-native infrastructure using modern engineering practices.
-          </motion.p>
+            {/* glass frame */}
+            <div className="relative rounded-[2rem] hairline glass p-2 shadow-[0_30px_80px_-30px_oklch(0_0_0/_70%)]">
+              <div className="relative aspect-[4/5] overflow-hidden rounded-[1.6rem] bg-surface">
+                <img
+                  src={profileImg}
+                  alt="Portrait of Darshan Atkari"
+                  width={640}
+                  height={800}
+                  className="h-full w-full object-cover"
+                />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
+                <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/5 rounded-[1.6rem]" />
+              </div>
 
-          <motion.div variants={fade} className="flex flex-wrap items-center gap-3">
-            <a
-              href="#projects"
-              className="group inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-[0_8px_30px_-8px_oklch(0.78_0.14_65/_50%)] transition hover:brightness-110"
-            >
-              View Projects
-              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-            </a>
-            <a
-              href="https://github.com/darshanatkari"
-              target="_blank"
-              rel="noreferrer"
-              className="group inline-flex items-center gap-2 rounded-full hairline bg-surface px-5 py-3 text-sm font-medium text-foreground transition hover:bg-surface-elevated"
-            >
-              <Github className="h-4 w-4" />
-              GitHub
-            </a>
-            <a
-              href="#resume"
-              className="group inline-flex items-center gap-2 rounded-full bg-transparent px-5 py-3 text-sm font-medium text-muted-foreground transition hover:text-foreground"
-            >
-              <FileText className="h-4 w-4" />
-              Resume
-              <ArrowUpRight className="h-3.5 w-3.5 opacity-60 transition group-hover:opacity-100" />
-            </a>
+              {/* terminal-style badge */}
+              <div className="absolute -bottom-3 left-6 flex items-center gap-2 rounded-full hairline glass px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                kubectl get engineer
+              </div>
+            </div>
           </motion.div>
-        </motion.div>
+        </div>
 
-        {/* portrait + meta strip */}
+        {/* Stats — kept, tighter spacing connecting to hero */}
         <motion.div
           variants={stagger}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-80px" }}
-          className="mt-20 grid grid-cols-1 items-end gap-10 md:grid-cols-[1fr_auto]"
+          className="mt-16 grid grid-cols-2 gap-x-10 gap-y-6 border-t border-hairline pt-10 sm:grid-cols-4"
         >
-          <motion.div variants={fade} className="grid grid-cols-2 gap-x-10 gap-y-6 sm:grid-cols-4">
-            {[
-              ["05+", "Production-grade projects"],
-              ["12", "Cloud-native services"],
-              ["20+", "Tools & integrations"],
-              ["100%", "Infrastructure as code"],
-            ].map(([k, v]) => (
-              <div key={v} className="border-l border-hairline pl-4">
-                <div className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">{k}</div>
-                <div className="mt-1 text-xs leading-snug text-muted-foreground">{v}</div>
-              </div>
-            ))}
-          </motion.div>
-
-          <motion.div variants={fade} className="relative">
-            <div className="absolute -inset-3 -z-10 rounded-[2rem] bg-primary/20 blur-2xl" />
-            <div className="relative h-44 w-44 overflow-hidden rounded-[1.75rem] hairline bg-surface sm:h-56 sm:w-56">
-              <img
-                src={profileImg}
-                alt="Portrait of Darshan Atkari"
-                width={448}
-                height={448}
-                className="h-full w-full object-cover"
-              />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/40 via-transparent" />
-            </div>
-          </motion.div>
+          {[
+            ["05+", "Production-grade projects"],
+            ["12", "Cloud-native services"],
+            ["20+", "Tools & integrations"],
+            ["100%", "Infrastructure as code"],
+          ].map(([k, v]) => (
+            <motion.div variants={fade} key={v} className="border-l border-hairline pl-4">
+              <div className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">{k}</div>
+              <div className="mt-1 text-xs leading-snug text-muted-foreground">{v}</div>
+            </motion.div>
+          ))}
         </motion.div>
       </div>
     </section>
