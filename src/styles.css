@@ -70,15 +70,15 @@
 :root {
   /* Dark, premium engineering aesthetic — warm near-black with amber accent */
   --radius: 0.75rem;
-  --background: oklch(0.14 0.006 60);
-  --foreground: oklch(0.97 0.005 80);
-  --surface: oklch(0.17 0.006 60);
-  --surface-elevated: oklch(0.21 0.008 60);
+  --background: oklch(0.13 0.02 255);
+  --foreground: oklch(0.97 0.005 240);
+  --surface: oklch(0.17 0.022 255);
+  --surface-elevated: oklch(0.21 0.025 255);
   --hairline: oklch(1 0 0 / 8%);
-  --card: oklch(0.17 0.006 60);
-  --card-foreground: oklch(0.97 0.005 80);
-  --popover: oklch(0.17 0.006 60);
-  --popover-foreground: oklch(0.97 0.005 80);
+  --card: oklch(0.17 0.022 255);
+  --card-foreground: oklch(0.97 0.005 240);
+  --popover: oklch(0.17 0.022 255);
+  --popover-foreground: oklch(0.97 0.005 240);
   --primary: oklch(0.7 0.18 240);
   --primary-foreground: oklch(0.14 0.03 250);
   --secondary: oklch(0.22 0.008 60);
