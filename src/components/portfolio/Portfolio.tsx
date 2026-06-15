@@ -918,7 +918,6 @@ export default function Portfolio() {
       <Nav />
       <Hero />
       <Marquee />
-      <About />
       <Domains />
       <Projects />
       <Stack />
