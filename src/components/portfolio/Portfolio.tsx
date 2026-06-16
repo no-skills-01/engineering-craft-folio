@@ -211,27 +211,6 @@ function Hero() {
             </div>
           </motion.div>
         </div>
-
-        {/* Stats — kept, tighter spacing connecting to hero */}
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-80px" }}
-          className="mt-16 grid grid-cols-2 gap-x-10 gap-y-6 border-t border-hairline pt-10 sm:grid-cols-4"
-        >
-          {[
-            ["05+", "Production-grade projects"],
-            ["12", "Cloud-native services"],
-            ["20+", "Tools & integrations"],
-            ["100%", "Infrastructure as code"],
-          ].map(([k, v]) => (
-            <motion.div variants={fade} key={v} className="border-l border-hairline pl-4">
-              <div className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">{k}</div>
-              <div className="mt-1 text-xs leading-snug text-muted-foreground">{v}</div>
-            </motion.div>
-          ))}
-        </motion.div>
       </div>
     </section>
   );
