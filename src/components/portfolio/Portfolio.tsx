@@ -14,7 +14,6 @@ import {
   Activity,
   ArrowRight,
   Award,
-  ExternalLink,
   GitBranch,
   Star,
   Users,
