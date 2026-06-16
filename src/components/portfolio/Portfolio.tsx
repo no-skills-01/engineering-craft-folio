@@ -944,6 +944,7 @@ function ProjectRow({ p, i, featured = false }: { p: Project; i: number; feature
 }
 
 function Projects() {
+  const [flagship, ...rest] = PROJECTS;
   return (
     <section id="projects" className="section-pad relative">
       <div className="mx-auto max-w-6xl px-6">
@@ -960,9 +961,38 @@ function Projects() {
           </p>
         </div>
 
-        <div className="mt-20 space-y-28">
-          {PROJECTS.map((p, i) => (
-            <ProjectRow key={p.num} p={p} i={i} />
+        <div className="mt-20">
+          <ProjectRow p={flagship} i={0} featured />
+        </div>
+
+        {/* Terminal interlude — engineering character break */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.7 }}
+          className="mx-auto mt-24 grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-12 md:items-center"
+        >
+          <div className="md:col-span-5">
+            <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+              <TerminalIcon className="h-3.5 w-3.5 text-primary" /> live shell
+            </div>
+            <h3 className="mt-3 font-display text-balance text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
+              The interface I think in.
+            </h3>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Most of my craft happens in plain text — declarations, manifests, pipelines.
+              Each command is a contract with production.
+            </p>
+          </div>
+          <div className="md:col-span-7">
+            <CommandTerminal />
+          </div>
+        </motion.div>
+
+        <div className="mt-28 space-y-28">
+          {rest.map((p, i) => (
+            <ProjectRow key={p.num} p={p} i={i + 1} />
           ))}
         </div>
       </div>
