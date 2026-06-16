@@ -105,6 +105,7 @@ function Hero() {
       <motion.div style={{ y, opacity }} aria-hidden className="absolute inset-0 -z-10">
         <div className="absolute inset-0 grid-pattern opacity-60" />
         <div className="absolute left-1/2 top-0 h-[640px] w-[1200px] -translate-x-1/2 amber-glow" />
+        <HeroBlueprint />
         <div className="absolute left-1/2 top-40 h-[1px] w-[80%] -translate-x-1/2 bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
         <div className="absolute -left-40 top-40 h-[28rem] w-[28rem] rounded-full bg-primary/15 blur-[140px]" />
         <div className="absolute -right-32 top-72 h-[26rem] w-[26rem] rounded-full bg-accent/10 blur-[160px]" />
