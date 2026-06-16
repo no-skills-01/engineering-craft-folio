@@ -1,5 +1,5 @@
 import { motion, useScroll, useTransform, type Variants } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowUpRight,
   Github,
@@ -14,10 +14,13 @@ import {
   Activity,
   ArrowRight,
   Award,
-  ExternalLink,
   GitBranch,
   Star,
   Users,
+  Terminal as TerminalIcon,
+  Zap,
+  Eye,
+  Workflow,
 } from "lucide-react";
 
 import profileImg from "@/assets/profile.jpg";
@@ -207,57 +210,301 @@ function Hero() {
             </div>
           </motion.div>
         </div>
-
-        {/* Stats — kept, tighter spacing connecting to hero */}
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-80px" }}
-          className="mt-16 grid grid-cols-2 gap-x-10 gap-y-6 border-t border-hairline pt-10 sm:grid-cols-4"
-        >
-          {[
-            ["05+", "Production-grade projects"],
-            ["12", "Cloud-native services"],
-            ["20+", "Tools & integrations"],
-            ["100%", "Infrastructure as code"],
-          ].map(([k, v]) => (
-            <motion.div variants={fade} key={v} className="border-l border-hairline pl-4">
-              <div className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">{k}</div>
-              <div className="mt-1 text-xs leading-snug text-muted-foreground">{v}</div>
-            </motion.div>
-          ))}
-        </motion.div>
       </div>
     </section>
   );
 }
 
 /* ============================================================ */
-/*                   TECH MARQUEE                               */
+/*                ENGINEERING PHILOSOPHY                        */
 /* ============================================================ */
-function Marquee() {
-  const items = [
-    "AWS", "Kubernetes", "Terraform", "ArgoCD", "Prometheus", "Grafana",
-    "Docker", "Helm", "Vault", "GitHub Actions", "OpenTelemetry", "MLflow",
-    "Ansible", "Loki", "KServe", "Trivy",
+function Philosophy() {
+  const pillars = [
+    { icon: Workflow, k: "Automate", t: "Every manual step is a future incident — codified, versioned, repeatable." },
+    { icon: ShieldCheck, k: "Reliable", t: "Designed for failure: SLOs, error budgets, graceful degradation by default." },
+    { icon: Eye, k: "Observable", t: "Metrics, logs and traces unified — you cannot operate what you cannot see." },
+    { icon: Cloud, k: "Cloud Native", t: "Loosely coupled, declarative, elastic — built to live on Kubernetes." },
+    { icon: Boxes, k: "Platform", t: "Golden paths and paved roads — developer experience as a product surface." },
+    { icon: Zap, k: "Operational", t: "Runbooks, on-call hygiene, post-mortems — excellence is a daily practice." },
   ];
   return (
-    <section className="relative overflow-hidden border-y border-hairline bg-surface/30 py-6">
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-32 bg-gradient-to-r from-background to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-32 bg-gradient-to-l from-background to-transparent" />
-      <motion.div
-        className="flex gap-12 whitespace-nowrap"
-        animate={{ x: ["0%", "-50%"] }}
-        transition={{ duration: 40, ease: "linear", repeat: Infinity }}
-      >
-        {[...items, ...items, ...items].map((t, i) => (
-          <span key={i} className="font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
-            <span className="mr-12 text-primary/60">/</span>{t}
-          </span>
-        ))}
-      </motion.div>
+    <section id="philosophy" className="section-pad relative overflow-hidden border-t border-hairline">
+      <FlowField className="opacity-[0.18]" />
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-12 md:items-end">
+          <div className="md:col-span-7">
+            <SectionLabel index="◇" title="Engineering Philosophy" />
+            <h2 className="mt-6 font-display text-balance text-4xl font-semibold leading-[1.02] tracking-tight sm:text-5xl md:text-6xl">
+              Automating the present.
+              <br />
+              <span className="bg-gradient-to-r from-primary via-accent to-foreground bg-clip-text text-transparent">
+                Scaling the future.
+              </span>
+            </h2>
+          </div>
+          <p className="md:col-span-5 max-w-md text-base text-muted-foreground">
+            Software is no longer shipped — it is operated. I build the unseen layer that
+            keeps platforms reliable, secure, observable and developer-friendly at scale.
+          </p>
+        </div>
+
+        <div className="mt-14 grid grid-cols-1 gap-px overflow-hidden rounded-3xl hairline bg-hairline sm:grid-cols-2 lg:grid-cols-3">
+          {pillars.map((p, i) => (
+            <motion.div
+              key={p.k}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5, delay: i * 0.05 }}
+              className="group relative bg-background p-7 transition hover:bg-surface/60"
+            >
+              <div className="flex items-center gap-3">
+                <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary">
+                  <p.icon className="h-4 w-4" />
+                </div>
+                <span className="font-display text-lg font-semibold tracking-tight">{p.k}</span>
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.t}</p>
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 transition group-hover:opacity-100" />
+            </motion.div>
+          ))}
+        </div>
+      </div>
     </section>
+  );
+}
+
+/* ============================================================ */
+/*           ENGINEERING-THEMED MOTION PRIMITIVES               */
+/* ============================================================ */
+
+/** Subtle flowing topology background (network packets along curves). */
+function FlowField({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 800 400"
+      preserveAspectRatio="none"
+      className={`pointer-events-none absolute inset-0 -z-10 h-full w-full text-primary ${className}`}
+    >
+      <defs>
+        <linearGradient id="ff-ln" x1="0" x2="1">
+          <stop offset="0" stopColor="currentColor" stopOpacity="0" />
+          <stop offset="0.5" stopColor="currentColor" stopOpacity="0.5" />
+          <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      {[80, 160, 240, 320].map((y, i) => (
+        <g key={y}>
+          <path
+            id={`ff-p-${i}`}
+            d={`M0 ${y} C200 ${y - 30} 600 ${y + 30} 800 ${y}`}
+            fill="none"
+            stroke="url(#ff-ln)"
+            strokeWidth="1"
+          />
+          <circle r="2" fill="currentColor">
+            <animateMotion dur={`${7 + i * 1.5}s`} repeatCount="indefinite" rotate="auto">
+              <mpath href={`#ff-p-${i}`} />
+            </animateMotion>
+            <animate attributeName="opacity" values="0;1;0" dur={`${7 + i * 1.5}s`} repeatCount="indefinite" />
+          </circle>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+/** Per-project animated overlay — visual storytelling on top of the static diagram. */
+function ProjectFlowOverlay({ kind }: { kind: "cloud" | "k8s" | "tf" | "mlops" | "devsecops" }) {
+  const common = "pointer-events-none absolute inset-0 h-full w-full";
+  if (kind === "cloud") {
+    // cloud traffic pulse
+    return (
+      <svg aria-hidden viewBox="0 0 400 280" className={`${common} text-primary`}>
+        <defs>
+          <radialGradient id="cl-g">
+            <stop offset="0" stopColor="currentColor" stopOpacity="0.7" />
+            <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        {[
+          "M40 220 C 120 160 200 100 360 60",
+          "M40 220 C 140 200 240 180 360 140",
+          "M40 220 C 100 220 220 240 360 220",
+        ].map((d, i) => (
+          <g key={i}>
+            <path id={`cl-p-${i}`} d={d} stroke="currentColor" strokeOpacity="0.35" strokeWidth="1" fill="none" strokeDasharray="2 4" />
+            <circle r="3" fill="url(#cl-g)">
+              <animateMotion dur={`${4 + i}s`} repeatCount="indefinite"><mpath href={`#cl-p-${i}`} /></animateMotion>
+            </circle>
+          </g>
+        ))}
+        {[[40,220],[360,60],[360,140],[360,220]].map(([x,y],i)=>(
+          <circle key={i} cx={x} cy={y} r="4" fill="currentColor" opacity="0.8">
+            <animate attributeName="r" values="4;7;4" dur="2.4s" repeatCount="indefinite" />
+          </circle>
+        ))}
+      </svg>
+    );
+  }
+  if (kind === "k8s") {
+    const pods = [[90,90],[200,70],[310,90],[90,200],[200,220],[310,200]];
+    return (
+      <svg aria-hidden viewBox="0 0 400 280" className={`${common} text-primary`}>
+        {pods.flatMap((a, i) =>
+          pods.slice(i + 1).map(([bx, by], j) => (
+            <line key={`${i}-${j}`} x1={a[0]} y1={a[1]} x2={bx} y2={by} stroke="currentColor" strokeOpacity="0.15" strokeWidth="0.5" />
+          ))
+        )}
+        {pods.map(([x, y], i) => (
+          <g key={i}>
+            <circle cx={x} cy={y} r="6" fill="currentColor" opacity="0.85" />
+            <circle cx={x} cy={y} r="10" fill="none" stroke="currentColor" strokeOpacity="0.4">
+              <animate attributeName="r" values="6;18;6" dur={`${2 + (i % 3)}s`} repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.5;0;0.5" dur={`${2 + (i % 3)}s`} repeatCount="indefinite" />
+            </circle>
+          </g>
+        ))}
+      </svg>
+    );
+  }
+  if (kind === "tf") {
+    const nodes = [[60,140],[160,70],[160,210],[260,140],[360,80],[360,200]];
+    const edges: [number, number][] = [[0,1],[0,2],[1,3],[2,3],[3,4],[3,5]];
+    return (
+      <svg aria-hidden viewBox="0 0 400 280" className={`${common} text-primary`}>
+        {edges.map(([a,b], i) => {
+          const [x1,y1] = nodes[a], [x2,y2] = nodes[b];
+          return (
+            <g key={i}>
+              <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="currentColor" strokeOpacity="0.3" strokeWidth="1" />
+              <circle r="2.5" fill="currentColor">
+                <animate attributeName="cx" values={`${x1};${x2}`} dur={`${2 + i * 0.4}s`} repeatCount="indefinite" />
+                <animate attributeName="cy" values={`${y1};${y2}`} dur={`${2 + i * 0.4}s`} repeatCount="indefinite" />
+              </circle>
+            </g>
+          );
+        })}
+        {nodes.map(([x,y], i) => (
+          <rect key={i} x={x-7} y={y-7} width="14" height="14" rx="3" fill="currentColor" opacity="0.8" />
+        ))}
+      </svg>
+    );
+  }
+  if (kind === "mlops") {
+    return (
+      <svg aria-hidden viewBox="0 0 400 280" className={`${common} text-primary`}>
+        <path id="ml-p" d="M30 200 Q 120 60 200 140 T 370 80" stroke="currentColor" strokeOpacity="0.35" strokeWidth="1" fill="none" />
+        {["Data", "Train", "Registry", "Serve"].map((label, i) => {
+          const x = 30 + i * 113;
+          const y = i % 2 === 0 ? 200 : 110;
+          return (
+            <g key={label}>
+              <rect x={x - 26} y={y - 12} width="52" height="24" rx="6" fill="currentColor" opacity="0.15" />
+              <text x={x} y={y + 4} textAnchor="middle" fontSize="9" fill="currentColor" opacity="0.9" fontFamily="monospace">{label}</text>
+            </g>
+          );
+        })}
+        {[0, 0.6, 1.2].map((delay, i) => (
+          <circle key={i} r="3" fill="currentColor">
+            <animateMotion dur="4s" begin={`${delay}s`} repeatCount="indefinite"><mpath href="#ml-p" /></animateMotion>
+          </circle>
+        ))}
+      </svg>
+    );
+  }
+  // devsecops pipeline
+  const steps = ["commit", "build", "scan", "deploy"];
+  return (
+    <svg aria-hidden viewBox="0 0 400 280" className={`${common} text-primary`}>
+      <line x1="40" y1="140" x2="360" y2="140" stroke="currentColor" strokeOpacity="0.3" strokeDasharray="3 4" />
+      {steps.map((s, i) => {
+        const x = 40 + i * (320 / 3);
+        return (
+          <g key={s}>
+            <circle cx={x} cy={140} r="10" fill="currentColor" opacity="0.85" />
+            <circle cx={x} cy={140} r="14" fill="none" stroke="currentColor" strokeOpacity="0.5">
+              <animate attributeName="r" values="10;22;10" dur="3s" begin={`${i * 0.6}s`} repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.6;0;0.6" dur="3s" begin={`${i * 0.6}s`} repeatCount="indefinite" />
+            </circle>
+            <text x={x} y={170} textAnchor="middle" fontSize="9" fontFamily="monospace" fill="currentColor" opacity="0.8">{s}</text>
+          </g>
+        );
+      })}
+      <circle r="3.5" fill="currentColor">
+        <animate attributeName="cx" values="40;360" dur="4s" repeatCount="indefinite" />
+        <animate attributeName="cy" values="140;140" dur="4s" repeatCount="indefinite" />
+      </circle>
+    </svg>
+  );
+}
+
+/* ============================================================ */
+/*                   TERMINAL COMPONENT                         */
+/* ============================================================ */
+function CommandTerminal() {
+  const lines = [
+    { cmd: "terraform apply -auto-approve", out: "Apply complete! 37 added, 0 changed, 0 destroyed." },
+    { cmd: "kubectl get pods -n platform", out: "argocd-server-7c9f   1/1   Running   0   12d" },
+    { cmd: "argocd app sync platform", out: "Synced  →  Healthy" },
+    { cmd: "docker build -t platform/api:1.4.2 .", out: "Successfully tagged platform/api:1.4.2" },
+    { cmd: "gh workflow run release.yml", out: "✓ release.yml queued on main" },
+  ];
+  const [idx, setIdx] = useState(0);
+  const [typed, setTyped] = useState("");
+  const [showOut, setShowOut] = useState(false);
+
+  useEffect(() => {
+    const cmd = lines[idx].cmd;
+    setTyped("");
+    setShowOut(false);
+    let i = 0;
+    const typer = setInterval(() => {
+      i++;
+      setTyped(cmd.slice(0, i));
+      if (i >= cmd.length) {
+        clearInterval(typer);
+        setTimeout(() => setShowOut(true), 250);
+        setTimeout(() => setIdx((p) => (p + 1) % lines.length), 2600);
+      }
+    }, 45);
+    return () => clearInterval(typer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx]);
+
+  return (
+    <div className="relative overflow-hidden rounded-2xl hairline bg-[oklch(0.1_0.02_255)] shadow-[0_30px_80px_-30px_oklch(0_0_0/_70%)]">
+      <div className="flex items-center gap-2 border-b border-hairline px-4 py-2.5">
+        <span className="h-2.5 w-2.5 rounded-full bg-destructive/70" />
+        <span className="h-2.5 w-2.5 rounded-full bg-primary/70" />
+        <span className="h-2.5 w-2.5 rounded-full bg-accent/70" />
+        <span className="ml-3 font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+          ~/platform · zsh
+        </span>
+      </div>
+      <div className="space-y-2 p-5 font-mono text-[13px] leading-relaxed sm:text-sm">
+        {lines.slice(0, idx).map((l, i) => (
+          <div key={i} className="opacity-50">
+            <div><span className="text-primary">❯</span> {l.cmd}</div>
+            <div className="pl-3 text-muted-foreground">{l.out}</div>
+          </div>
+        ))}
+        <div>
+          <span className="text-primary">❯</span> {typed}
+          <span className="ml-0.5 inline-block h-4 w-1.5 -mb-0.5 animate-pulse bg-primary" />
+        </div>
+        {showOut && (
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="pl-3 text-muted-foreground"
+          >
+            {lines[idx].out}
+          </motion.div>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -417,6 +664,7 @@ type Project = {
   image: string;
   github: string;
   docs: string;
+  flow: "cloud" | "k8s" | "tf" | "mlops" | "devsecops";
 };
 
 const PROJECTS: Project[] = [
@@ -435,6 +683,7 @@ const PROJECTS: Project[] = [
     image: projAws,
     github: "https://github.com/darshanatkari",
     docs: "#",
+    flow: "cloud",
   },
   {
     num: "02",
@@ -451,6 +700,7 @@ const PROJECTS: Project[] = [
     image: projK8s,
     github: "https://github.com/darshanatkari",
     docs: "#",
+    flow: "k8s",
   },
   {
     num: "03",
@@ -467,6 +717,7 @@ const PROJECTS: Project[] = [
     image: projTf,
     github: "https://github.com/darshanatkari",
     docs: "#",
+    flow: "tf",
   },
   {
     num: "04",
@@ -483,6 +734,7 @@ const PROJECTS: Project[] = [
     image: projMlops,
     github: "https://github.com/darshanatkari",
     docs: "#",
+    flow: "mlops",
   },
   {
     num: "05",
@@ -499,11 +751,84 @@ const PROJECTS: Project[] = [
     image: projDevsec,
     github: "https://github.com/darshanatkari",
     docs: "#",
+    flow: "devsecops",
   },
 ];
 
-function ProjectRow({ p, i }: { p: Project; i: number }) {
-  const flip = i % 2 === 1;
+function ProjectRow({ p, i, featured = false }: { p: Project; i: number; featured?: boolean }) {
+  const flip = !featured && i % 2 === 1;
+  if (featured) {
+    return (
+      <motion.article
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        className="relative"
+      >
+        <div className="mb-6 flex items-center gap-3">
+          <span className="rounded-full bg-primary px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-primary-foreground">
+            Flagship
+          </span>
+          <span className="font-mono text-xs text-primary">{p.num}</span>
+          <div className="h-px flex-1 bg-gradient-to-r from-primary/40 to-transparent" />
+        </div>
+        <div className="group relative overflow-hidden rounded-[2rem] hairline bg-surface">
+          <div className="absolute -inset-px -z-10 rounded-[2rem] bg-gradient-to-br from-primary/40 via-accent/15 to-transparent opacity-70" />
+          <div className="relative aspect-[21/10] overflow-hidden">
+            <img
+              src={p.image}
+              alt={`${p.title} — architecture visual`}
+              loading="eager"
+              className="h-full w-full object-cover transition duration-[1200ms] group-hover:scale-[1.02]"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+            <ProjectFlowOverlay kind={p.flow} />
+            <div className="absolute left-5 top-5 flex items-center gap-2 rounded-full glass hairline px-3 py-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                {p.kicker}
+              </span>
+            </div>
+            <div className="absolute inset-x-0 bottom-0 grid grid-cols-1 gap-6 p-6 md:grid-cols-12 md:gap-10 md:p-10">
+              <div className="md:col-span-7">
+                <h3 className="font-display text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl md:text-5xl">
+                  {p.title}
+                </h3>
+                <p className="mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">{p.summary}</p>
+              </div>
+              <div className="md:col-span-5">
+                <ul className="space-y-1.5">
+                  {p.outcomes.map((o) => (
+                    <li key={o} className="flex items-start gap-2 text-sm text-foreground/85">
+                      <span className="mt-2 h-1 w-1 rounded-full bg-primary" />
+                      {o}
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                  {p.tech.map((t) => (
+                    <span key={t} className="rounded-full hairline bg-surface/80 px-2.5 py-0.5 font-mono text-[11px] text-muted-foreground">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <a href={p.github} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-foreground/95 px-4 py-2 text-xs font-semibold text-background transition hover:bg-foreground">
+                    <Github className="h-3.5 w-3.5" /> GitHub
+                  </a>
+                  <a href={p.docs} className="inline-flex items-center gap-2 rounded-full hairline glass px-4 py-2 text-xs font-medium transition hover:bg-surface-elevated">
+                    <FileText className="h-3.5 w-3.5" /> Documentation
+                    <ArrowUpRight className="h-3 w-3 opacity-60" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.article>
+    );
+  }
   return (
     <motion.article
       initial={{ opacity: 0, y: 40 }}
@@ -526,6 +851,7 @@ function ProjectRow({ p, i }: { p: Project; i: number }) {
               className="h-full w-full object-cover transition duration-[1200ms] group-hover:scale-[1.03]"
             />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/70 via-background/0 to-background/0" />
+            <ProjectFlowOverlay kind={p.flow} />
             <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full glass hairline px-2.5 py-1">
               <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                 {p.kicker}
@@ -589,6 +915,7 @@ function ProjectRow({ p, i }: { p: Project; i: number }) {
 }
 
 function Projects() {
+  const [flagship, ...rest] = PROJECTS;
   return (
     <section id="projects" className="section-pad relative">
       <div className="mx-auto max-w-6xl px-6">
@@ -605,9 +932,38 @@ function Projects() {
           </p>
         </div>
 
-        <div className="mt-20 space-y-28">
-          {PROJECTS.map((p, i) => (
-            <ProjectRow key={p.num} p={p} i={i} />
+        <div className="mt-20">
+          <ProjectRow p={flagship} i={0} featured />
+        </div>
+
+        {/* Terminal interlude — engineering character break */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.7 }}
+          className="mx-auto mt-24 grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-12 md:items-center"
+        >
+          <div className="md:col-span-5">
+            <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+              <TerminalIcon className="h-3.5 w-3.5 text-primary" /> live shell
+            </div>
+            <h3 className="mt-3 font-display text-balance text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
+              The interface I think in.
+            </h3>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Most of my craft happens in plain text — declarations, manifests, pipelines.
+              Each command is a contract with production.
+            </p>
+          </div>
+          <div className="md:col-span-7">
+            <CommandTerminal />
+          </div>
+        </motion.div>
+
+        <div className="mt-28 space-y-28">
+          {rest.map((p, i) => (
+            <ProjectRow key={p.num} p={p} i={i + 1} />
           ))}
         </div>
       </div>
@@ -745,12 +1101,49 @@ function Certifications() {
 /*                       GITHUB                                 */
 /* ============================================================ */
 function GitHubSection() {
-  const stats = [
-    { icon: GitBranch, value: "60+", label: "Public repositories" },
-    { icon: Star, value: "200+", label: "Lifetime stars" },
-    { icon: Activity, value: "1.2k+", label: "Contributions / year" },
-    { icon: Users, value: "Org", label: "CloudNative blueprints" },
-  ];
+  const [data, setData] = useState<{
+    repos: number;
+    stars: number;
+    followers: number;
+    following: number;
+  } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const user = "darshanatkari";
+        const [u, r] = await Promise.all([
+          fetch(`https://api.github.com/users/${user}`).then((x) => x.json()),
+          fetch(`https://api.github.com/users/${user}/repos?per_page=100&sort=updated`).then((x) => x.json()),
+        ]);
+        if (cancelled || !u || u.message) return;
+        const stars = Array.isArray(r)
+          ? r.reduce((a: number, repo: { stargazers_count?: number }) => a + (repo.stargazers_count ?? 0), 0)
+          : 0;
+        setData({
+          repos: u.public_repos ?? 0,
+          stars,
+          followers: u.followers ?? 0,
+          following: u.following ?? 0,
+        });
+      } catch {
+        /* network blocked / offline — section gracefully renders without stats */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const stats = data
+    ? [
+        { icon: GitBranch, value: String(data.repos), label: "Public repositories" },
+        { icon: Star, value: String(data.stars), label: "Stars across repos" },
+        { icon: Users, value: String(data.followers), label: "Followers" },
+        { icon: Activity, value: String(data.following), label: "Following" },
+      ]
+    : [];
 
   return (
     <section className="section-pad relative overflow-hidden border-t border-hairline">
@@ -778,62 +1171,42 @@ function GitHubSection() {
                 <Github className="h-4 w-4" />
                 @darshanatkari
               </a>
-              <a
-                href="https://github.com/cloudnative-blueprints"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-full hairline bg-surface px-5 py-2.5 text-sm font-medium transition hover:bg-surface-elevated"
-              >
-                Organization
-                <ExternalLink className="h-3.5 w-3.5" />
-              </a>
             </div>
           </div>
 
           <div className="md:col-span-7">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
-              {stats.map((s, i) => (
-                <motion.div
-                  key={s.label}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.07 }}
-                  className="relative overflow-hidden rounded-2xl hairline bg-surface/70 p-5"
-                >
-                  <s.icon className="h-4 w-4 text-primary" />
-                  <div className="mt-6 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-                    {s.value}
-                  </div>
-                  <div className="mt-1 text-xs text-muted-foreground">{s.label}</div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* contribution heatmap mock */}
-            <div className="mt-3 rounded-2xl hairline bg-surface/70 p-5">
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                  Contributions
-                </span>
-                <span className="font-mono text-[11px] text-muted-foreground">last 26 weeks</span>
+            {data ? (
+              <div className="grid grid-cols-2 gap-3">
+                {stats.map((s, i) => (
+                  <motion.div
+                    key={s.label}
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: i * 0.07 }}
+                    className="relative overflow-hidden rounded-2xl hairline bg-surface/70 p-5"
+                  >
+                    <s.icon className="h-4 w-4 text-primary" />
+                    <div className="mt-6 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+                      {s.value}
+                    </div>
+                    <div className="mt-1 text-xs text-muted-foreground">{s.label}</div>
+                    <span className="absolute right-3 top-3 font-mono text-[10px] uppercase tracking-[0.18em] text-primary/70">
+                      live
+                    </span>
+                  </motion.div>
+                ))}
               </div>
-              <div className="mt-4 grid grid-cols-[repeat(26,minmax(0,1fr))] gap-1">
-                {Array.from({ length: 26 * 7 }).map((_, i) => {
-                  // pseudo-random but stable
-                  const v = (Math.sin(i * 1.3) + 1) / 2;
-                  const lvl = v > 0.85 ? 4 : v > 0.65 ? 3 : v > 0.45 ? 2 : v > 0.25 ? 1 : 0;
-                  const colors = [
-                    "bg-secondary",
-                    "bg-primary/20",
-                    "bg-primary/40",
-                    "bg-primary/70",
-                    "bg-primary",
-                  ];
-                  return <div key={i} className={`h-2.5 w-full rounded-[3px] ${colors[lvl]}`} />;
-                })}
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                {[0, 1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="h-32 animate-pulse rounded-2xl hairline bg-surface/50"
+                  />
+                ))}
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -917,7 +1290,7 @@ export default function Portfolio() {
     <main className="relative min-h-screen bg-background text-foreground antialiased">
       <Nav />
       <Hero />
-      <Marquee />
+      <Philosophy />
       <Domains />
       <Projects />
       <Stack />
