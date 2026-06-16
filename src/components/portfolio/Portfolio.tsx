@@ -1,5 +1,5 @@
 import { motion, useScroll, useTransform, type Variants } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowUpRight,
   Github,
@@ -18,6 +18,10 @@ import {
   GitBranch,
   Star,
   Users,
+  Terminal as TerminalIcon,
+  Zap,
+  Eye,
+  Workflow,
 } from "lucide-react";
 
 import profileImg from "@/assets/profile.jpg";
