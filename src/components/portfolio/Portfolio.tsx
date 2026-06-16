@@ -1319,7 +1319,7 @@ export default function Portfolio() {
     <main className="relative min-h-screen bg-background text-foreground antialiased">
       <Nav />
       <Hero />
-      <Marquee />
+      <Philosophy />
       <Domains />
       <Projects />
       <Stack />
