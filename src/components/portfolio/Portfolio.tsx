@@ -1130,12 +1130,49 @@ function Certifications() {
 /*                       GITHUB                                 */
 /* ============================================================ */
 function GitHubSection() {
-  const stats = [
-    { icon: GitBranch, value: "60+", label: "Public repositories" },
-    { icon: Star, value: "200+", label: "Lifetime stars" },
-    { icon: Activity, value: "1.2k+", label: "Contributions / year" },
-    { icon: Users, value: "Org", label: "CloudNative blueprints" },
-  ];
+  const [data, setData] = useState<{
+    repos: number;
+    stars: number;
+    followers: number;
+    following: number;
+  } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const user = "darshanatkari";
+        const [u, r] = await Promise.all([
+          fetch(`https://api.github.com/users/${user}`).then((x) => x.json()),
+          fetch(`https://api.github.com/users/${user}/repos?per_page=100&sort=updated`).then((x) => x.json()),
+        ]);
+        if (cancelled || !u || u.message) return;
+        const stars = Array.isArray(r)
+          ? r.reduce((a: number, repo: { stargazers_count?: number }) => a + (repo.stargazers_count ?? 0), 0)
+          : 0;
+        setData({
+          repos: u.public_repos ?? 0,
+          stars,
+          followers: u.followers ?? 0,
+          following: u.following ?? 0,
+        });
+      } catch {
+        /* network blocked / offline — section gracefully renders without stats */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const stats = data
+    ? [
+        { icon: GitBranch, value: String(data.repos), label: "Public repositories" },
+        { icon: Star, value: String(data.stars), label: "Stars across repos" },
+        { icon: Users, value: String(data.followers), label: "Followers" },
+        { icon: Activity, value: String(data.following), label: "Following" },
+      ]
+    : [];
 
   return (
     <section className="section-pad relative overflow-hidden border-t border-hairline">
@@ -1163,62 +1200,42 @@ function GitHubSection() {
                 <Github className="h-4 w-4" />
                 @darshanatkari
               </a>
-              <a
-                href="https://github.com/cloudnative-blueprints"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-full hairline bg-surface px-5 py-2.5 text-sm font-medium transition hover:bg-surface-elevated"
-              >
-                Organization
-                <ExternalLink className="h-3.5 w-3.5" />
-              </a>
             </div>
           </div>
 
           <div className="md:col-span-7">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
-              {stats.map((s, i) => (
-                <motion.div
-                  key={s.label}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.07 }}
-                  className="relative overflow-hidden rounded-2xl hairline bg-surface/70 p-5"
-                >
-                  <s.icon className="h-4 w-4 text-primary" />
-                  <div className="mt-6 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-                    {s.value}
-                  </div>
-                  <div className="mt-1 text-xs text-muted-foreground">{s.label}</div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* contribution heatmap mock */}
-            <div className="mt-3 rounded-2xl hairline bg-surface/70 p-5">
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                  Contributions
-                </span>
-                <span className="font-mono text-[11px] text-muted-foreground">last 26 weeks</span>
+            {data ? (
+              <div className="grid grid-cols-2 gap-3">
+                {stats.map((s, i) => (
+                  <motion.div
+                    key={s.label}
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: i * 0.07 }}
+                    className="relative overflow-hidden rounded-2xl hairline bg-surface/70 p-5"
+                  >
+                    <s.icon className="h-4 w-4 text-primary" />
+                    <div className="mt-6 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+                      {s.value}
+                    </div>
+                    <div className="mt-1 text-xs text-muted-foreground">{s.label}</div>
+                    <span className="absolute right-3 top-3 font-mono text-[10px] uppercase tracking-[0.18em] text-primary/70">
+                      live
+                    </span>
+                  </motion.div>
+                ))}
               </div>
-              <div className="mt-4 grid grid-cols-[repeat(26,minmax(0,1fr))] gap-1">
-                {Array.from({ length: 26 * 7 }).map((_, i) => {
-                  // pseudo-random but stable
-                  const v = (Math.sin(i * 1.3) + 1) / 2;
-                  const lvl = v > 0.85 ? 4 : v > 0.65 ? 3 : v > 0.45 ? 2 : v > 0.25 ? 1 : 0;
-                  const colors = [
-                    "bg-secondary",
-                    "bg-primary/20",
-                    "bg-primary/40",
-                    "bg-primary/70",
-                    "bg-primary",
-                  ];
-                  return <div key={i} className={`h-2.5 w-full rounded-[3px] ${colors[lvl]}`} />;
-                })}
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                {[0, 1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="h-32 animate-pulse rounded-2xl hairline bg-surface/50"
+                  />
+                ))}
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
