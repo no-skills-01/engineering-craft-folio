@@ -1288,6 +1288,7 @@ function Footer() {
 export default function Portfolio() {
   return (
     <main className="relative min-h-screen bg-background text-foreground antialiased">
+      <AmbientTopology />
       <Nav />
       <Hero />
       <Philosophy />
