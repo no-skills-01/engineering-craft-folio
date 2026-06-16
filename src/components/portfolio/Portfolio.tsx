@@ -316,6 +316,327 @@ function FlowField({ className = "" }: { className?: string }) {
   );
 }
 
+/* ------------------------------------------------------------ */
+/*  GLOBAL AMBIENT TOPOLOGY                                     */
+/*  Fixed full-viewport layer: distributed-systems node graph   */
+/*  with packets traversing service-to-service edges. Extremely */
+/*  subtle — sits behind every section.                         */
+/* ------------------------------------------------------------ */
+function AmbientTopology() {
+  // Deterministic node positions (percent of 1000x600 viewBox) shaped
+  // like a service mesh: edge ingress (left), services (mid), data (right).
+  const nodes: { x: number; y: number; r?: number }[] = [
+    { x: 60, y: 120 }, { x: 60, y: 300 }, { x: 60, y: 480 },
+    { x: 260, y: 80 }, { x: 260, y: 220 }, { x: 260, y: 380 }, { x: 260, y: 520 },
+    { x: 500, y: 140, r: 3 }, { x: 500, y: 300, r: 3 }, { x: 500, y: 460, r: 3 },
+    { x: 740, y: 100 }, { x: 740, y: 240 }, { x: 740, y: 380 }, { x: 740, y: 520 },
+    { x: 940, y: 200 }, { x: 940, y: 400 },
+  ];
+  const edges: [number, number][] = [
+    [0, 3], [0, 4], [1, 4], [1, 5], [2, 5], [2, 6],
+    [3, 7], [4, 7], [4, 8], [5, 8], [5, 9], [6, 9],
+    [7, 10], [7, 11], [8, 11], [8, 12], [9, 12], [9, 13],
+    [10, 14], [11, 14], [12, 15], [13, 15],
+  ];
+  // A handful of edges get packet animation.
+  const flowing = [1, 4, 6, 9, 12, 15, 18, 21];
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+      style={{ contain: "strict" }}
+    >
+      <svg
+        viewBox="0 0 1000 600"
+        preserveAspectRatio="xMidYMid slice"
+        className="absolute inset-0 h-full w-full text-primary opacity-[0.18]"
+        style={{
+          maskImage:
+            "radial-gradient(ellipse 80% 70% at 50% 40%, black 40%, transparent 90%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 80% 70% at 50% 40%, black 40%, transparent 90%)",
+        }}
+      >
+        <defs>
+          <radialGradient id="amb-node">
+            <stop offset="0" stopColor="currentColor" stopOpacity="0.95" />
+            <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        {/* edges */}
+        {edges.map(([a, b], i) => (
+          <line
+            key={i}
+            x1={nodes[a].x}
+            y1={nodes[a].y}
+            x2={nodes[b].x}
+            y2={nodes[b].y}
+            stroke="currentColor"
+            strokeOpacity="0.18"
+            strokeWidth="0.6"
+          />
+        ))}
+        {/* packets traversing select edges */}
+        {flowing.map((idx, i) => {
+          const [a, b] = edges[idx % edges.length];
+          const dur = 6 + ((i * 1.3) % 5);
+          return (
+            <circle key={`pkt-${i}`} r="1.6" fill="currentColor" opacity="0.9">
+              <animate
+                attributeName="cx"
+                from={nodes[a].x}
+                to={nodes[b].x}
+                dur={`${dur}s`}
+                begin={`${i * 0.7}s`}
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="cy"
+                from={nodes[a].y}
+                to={nodes[b].y}
+                dur={`${dur}s`}
+                begin={`${i * 0.7}s`}
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="opacity"
+                values="0;0.9;0"
+                dur={`${dur}s`}
+                begin={`${i * 0.7}s`}
+                repeatCount="indefinite"
+              />
+            </circle>
+          );
+        })}
+        {/* nodes */}
+        {nodes.map((n, i) => (
+          <g key={i}>
+            <circle cx={n.x} cy={n.y} r={(n.r ?? 2.2) + 4} fill="url(#amb-node)" opacity="0.35" />
+            <circle cx={n.x} cy={n.y} r={n.r ?? 2.2} fill="currentColor" />
+          </g>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------ */
+/*  HERO BLUEPRINT                                              */
+/*  Kubernetes-cluster / cloud-architecture blueprint for the   */
+/*  hero midground. Cluster boundary, control plane, worker     */
+/*  nodes, ingress, service edges — with packet pulses.         */
+/* ------------------------------------------------------------ */
+function HeroBlueprint() {
+  // viewBox 1200x600
+  const workers = [
+    { x: 280, y: 380 },
+    { x: 460, y: 420 },
+    { x: 640, y: 400 },
+    { x: 820, y: 430 },
+  ];
+  const cp = { x: 550, y: 200 };
+  const ingress = { x: 120, y: 300 };
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 1200 600"
+      preserveAspectRatio="xMidYMid slice"
+      className="absolute inset-0 h-full w-full text-primary opacity-[0.22]"
+      style={{
+        maskImage:
+          "linear-gradient(180deg, black 10%, black 60%, transparent 95%)",
+        WebkitMaskImage:
+          "linear-gradient(180deg, black 10%, black 60%, transparent 95%)",
+      }}
+    >
+      <defs>
+        <linearGradient id="hb-edge" x1="0" x2="1">
+          <stop offset="0" stopColor="currentColor" stopOpacity="0" />
+          <stop offset="0.5" stopColor="currentColor" stopOpacity="0.6" />
+          <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+
+      {/* cluster boundary (dashed) */}
+      <rect
+        x="200"
+        y="140"
+        width="900"
+        height="380"
+        rx="28"
+        fill="none"
+        stroke="currentColor"
+        strokeOpacity="0.18"
+        strokeWidth="1"
+        strokeDasharray="6 6"
+      />
+      <text
+        x="220"
+        y="132"
+        fill="currentColor"
+        opacity="0.45"
+        fontSize="11"
+        fontFamily="ui-monospace, monospace"
+        letterSpacing="2"
+      >
+        CLUSTER · us-east-1
+      </text>
+
+      {/* inner control-plane region */}
+      <rect
+        x="430"
+        y="160"
+        width="240"
+        height="100"
+        rx="14"
+        fill="currentColor"
+        fillOpacity="0.04"
+        stroke="currentColor"
+        strokeOpacity="0.25"
+        strokeWidth="0.8"
+      />
+      <text
+        x="450"
+        y="180"
+        fill="currentColor"
+        opacity="0.5"
+        fontSize="10"
+        fontFamily="ui-monospace, monospace"
+        letterSpacing="1.5"
+      >
+        control-plane
+      </text>
+
+      {/* control plane node */}
+      <circle cx={cp.x} cy={cp.y} r="6" fill="currentColor" />
+      <circle cx={cp.x} cy={cp.y} r="14" fill="currentColor" opacity="0.12" />
+
+      {/* ingress */}
+      <circle cx={ingress.x} cy={ingress.y} r="5" fill="currentColor" />
+      <text
+        x={ingress.x - 30}
+        y={ingress.y + 24}
+        fill="currentColor"
+        opacity="0.5"
+        fontSize="9"
+        fontFamily="ui-monospace, monospace"
+      >
+        ingress
+      </text>
+
+      {/* edges from control plane to workers + ingress → cp */}
+      <path
+        id="hb-in"
+        d={`M${ingress.x} ${ingress.y} C 300 260 380 220 ${cp.x} ${cp.y}`}
+        fill="none"
+        stroke="url(#hb-edge)"
+        strokeWidth="1"
+      />
+      {workers.map((w, i) => (
+        <g key={i}>
+          <path
+            id={`hb-w-${i}`}
+            d={`M${cp.x} ${cp.y} C ${cp.x} 300 ${w.x} 320 ${w.x} ${w.y}`}
+            fill="none"
+            stroke="url(#hb-edge)"
+            strokeWidth="0.9"
+          />
+          {/* worker node */}
+          <rect
+            x={w.x - 26}
+            y={w.y - 16}
+            width="52"
+            height="32"
+            rx="6"
+            fill="currentColor"
+            fillOpacity="0.06"
+            stroke="currentColor"
+            strokeOpacity="0.35"
+            strokeWidth="0.8"
+          />
+          <text
+            x={w.x}
+            y={w.y + 4}
+            textAnchor="middle"
+            fill="currentColor"
+            opacity="0.55"
+            fontSize="9"
+            fontFamily="ui-monospace, monospace"
+          >
+            node-{i + 1}
+          </text>
+          {/* pod dots inside worker */}
+          {[0, 1, 2].map((p) => (
+            <circle
+              key={p}
+              cx={w.x - 12 + p * 12}
+              cy={w.y + 24}
+              r="2"
+              fill="currentColor"
+              opacity="0.7"
+            />
+          ))}
+        </g>
+      ))}
+
+      {/* packets: ingress → control-plane → each worker */}
+      <circle r="2.2" fill="currentColor">
+        <animateMotion dur="5s" repeatCount="indefinite">
+          <mpath href="#hb-in" />
+        </animateMotion>
+        <animate attributeName="opacity" values="0;1;0" dur="5s" repeatCount="indefinite" />
+      </circle>
+      {workers.map((_, i) => (
+        <circle key={`p-${i}`} r="2" fill="currentColor">
+          <animateMotion
+            dur={`${4 + i * 0.6}s`}
+            begin={`${i * 0.8}s`}
+            repeatCount="indefinite"
+          >
+            <mpath href={`#hb-w-${i}`} />
+          </animateMotion>
+          <animate
+            attributeName="opacity"
+            values="0;1;0"
+            dur={`${4 + i * 0.6}s`}
+            begin={`${i * 0.8}s`}
+            repeatCount="indefinite"
+          />
+        </circle>
+      ))}
+
+      {/* telemetry tick marks bottom-right (observability hint) */}
+      <g transform="translate(960,470)" opacity="0.45">
+        {Array.from({ length: 24 }).map((_, i) => {
+          const h = 4 + ((i * 37) % 22);
+          return (
+            <rect
+              key={i}
+              x={i * 7}
+              y={-h}
+              width="3"
+              height={h}
+              fill="currentColor"
+              opacity={0.35 + (i % 5) * 0.08}
+            />
+          );
+        })}
+        <text
+          x="0"
+          y="14"
+          fill="currentColor"
+          opacity="0.55"
+          fontSize="8"
+          fontFamily="ui-monospace, monospace"
+          letterSpacing="1.5"
+        >
+          p99 · req/s
+        </text>
+      </g>
+    </svg>
+  );
+}
+
 /** Per-project animated overlay — visual storytelling on top of the static diagram. */
 function ProjectFlowOverlay({ kind }: { kind: "cloud" | "k8s" | "tf" | "mlops" | "devsecops" }) {
   const common = "pointer-events-none absolute inset-0 h-full w-full";
