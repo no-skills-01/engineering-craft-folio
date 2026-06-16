@@ -509,34 +509,6 @@ function CommandTerminal() {
 }
 
 /* ============================================================ */
-/*                   TECH MARQUEE (unused)                      */
-/* ============================================================ */
-function Marquee() {
-  const items = [
-    "AWS", "Kubernetes", "Terraform", "ArgoCD", "Prometheus", "Grafana",
-    "Docker", "Helm", "Vault", "GitHub Actions", "OpenTelemetry", "MLflow",
-    "Ansible", "Loki", "KServe", "Trivy",
-  ];
-  return (
-    <section className="relative overflow-hidden border-y border-hairline bg-surface/30 py-6">
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-32 bg-gradient-to-r from-background to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-32 bg-gradient-to-l from-background to-transparent" />
-      <motion.div
-        className="flex gap-12 whitespace-nowrap"
-        animate={{ x: ["0%", "-50%"] }}
-        transition={{ duration: 40, ease: "linear", repeat: Infinity }}
-      >
-        {[...items, ...items, ...items].map((t, i) => (
-          <span key={i} className="font-mono text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
-            <span className="mr-12 text-primary/60">/</span>{t}
-          </span>
-        ))}
-      </motion.div>
-    </section>
-  );
-}
-
-/* ============================================================ */
 /*                         ABOUT                                */
 /* ============================================================ */
 function About() {
