@@ -217,7 +217,300 @@ function Hero() {
 }
 
 /* ============================================================ */
-/*                   TECH MARQUEE                               */
+/*                ENGINEERING PHILOSOPHY                        */
+/* ============================================================ */
+function Philosophy() {
+  const pillars = [
+    { icon: Workflow, k: "Automate", t: "Every manual step is a future incident — codified, versioned, repeatable." },
+    { icon: ShieldCheck, k: "Reliable", t: "Designed for failure: SLOs, error budgets, graceful degradation by default." },
+    { icon: Eye, k: "Observable", t: "Metrics, logs and traces unified — you cannot operate what you cannot see." },
+    { icon: Cloud, k: "Cloud Native", t: "Loosely coupled, declarative, elastic — built to live on Kubernetes." },
+    { icon: Boxes, k: "Platform", t: "Golden paths and paved roads — developer experience as a product surface." },
+    { icon: Zap, k: "Operational", t: "Runbooks, on-call hygiene, post-mortems — excellence is a daily practice." },
+  ];
+  return (
+    <section id="philosophy" className="section-pad relative overflow-hidden border-t border-hairline">
+      <FlowField className="opacity-[0.18]" />
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-12 md:items-end">
+          <div className="md:col-span-7">
+            <SectionLabel index="◇" title="Engineering Philosophy" />
+            <h2 className="mt-6 font-display text-balance text-4xl font-semibold leading-[1.02] tracking-tight sm:text-5xl md:text-6xl">
+              Automating the present.
+              <br />
+              <span className="bg-gradient-to-r from-primary via-accent to-foreground bg-clip-text text-transparent">
+                Scaling the future.
+              </span>
+            </h2>
+          </div>
+          <p className="md:col-span-5 max-w-md text-base text-muted-foreground">
+            Software is no longer shipped — it is operated. I build the unseen layer that
+            keeps platforms reliable, secure, observable and developer-friendly at scale.
+          </p>
+        </div>
+
+        <div className="mt-14 grid grid-cols-1 gap-px overflow-hidden rounded-3xl hairline bg-hairline sm:grid-cols-2 lg:grid-cols-3">
+          {pillars.map((p, i) => (
+            <motion.div
+              key={p.k}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5, delay: i * 0.05 }}
+              className="group relative bg-background p-7 transition hover:bg-surface/60"
+            >
+              <div className="flex items-center gap-3">
+                <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary">
+                  <p.icon className="h-4 w-4" />
+                </div>
+                <span className="font-display text-lg font-semibold tracking-tight">{p.k}</span>
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.t}</p>
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 transition group-hover:opacity-100" />
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============================================================ */
+/*           ENGINEERING-THEMED MOTION PRIMITIVES               */
+/* ============================================================ */
+
+/** Subtle flowing topology background (network packets along curves). */
+function FlowField({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 800 400"
+      preserveAspectRatio="none"
+      className={`pointer-events-none absolute inset-0 -z-10 h-full w-full text-primary ${className}`}
+    >
+      <defs>
+        <linearGradient id="ff-ln" x1="0" x2="1">
+          <stop offset="0" stopColor="currentColor" stopOpacity="0" />
+          <stop offset="0.5" stopColor="currentColor" stopOpacity="0.5" />
+          <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      {[80, 160, 240, 320].map((y, i) => (
+        <g key={y}>
+          <path
+            id={`ff-p-${i}`}
+            d={`M0 ${y} C200 ${y - 30} 600 ${y + 30} 800 ${y}`}
+            fill="none"
+            stroke="url(#ff-ln)"
+            strokeWidth="1"
+          />
+          <circle r="2" fill="currentColor">
+            <animateMotion dur={`${7 + i * 1.5}s`} repeatCount="indefinite" rotate="auto">
+              <mpath href={`#ff-p-${i}`} />
+            </animateMotion>
+            <animate attributeName="opacity" values="0;1;0" dur={`${7 + i * 1.5}s`} repeatCount="indefinite" />
+          </circle>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+/** Per-project animated overlay — visual storytelling on top of the static diagram. */
+function ProjectFlowOverlay({ kind }: { kind: "cloud" | "k8s" | "tf" | "mlops" | "devsecops" }) {
+  const common = "pointer-events-none absolute inset-0 h-full w-full";
+  if (kind === "cloud") {
+    // cloud traffic pulse
+    return (
+      <svg aria-hidden viewBox="0 0 400 280" className={`${common} text-primary`}>
+        <defs>
+          <radialGradient id="cl-g">
+            <stop offset="0" stopColor="currentColor" stopOpacity="0.7" />
+            <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        {[
+          "M40 220 C 120 160 200 100 360 60",
+          "M40 220 C 140 200 240 180 360 140",
+          "M40 220 C 100 220 220 240 360 220",
+        ].map((d, i) => (
+          <g key={i}>
+            <path id={`cl-p-${i}`} d={d} stroke="currentColor" strokeOpacity="0.35" strokeWidth="1" fill="none" strokeDasharray="2 4" />
+            <circle r="3" fill="url(#cl-g)">
+              <animateMotion dur={`${4 + i}s`} repeatCount="indefinite"><mpath href={`#cl-p-${i}`} /></animateMotion>
+            </circle>
+          </g>
+        ))}
+        {[[40,220],[360,60],[360,140],[360,220]].map(([x,y],i)=>(
+          <circle key={i} cx={x} cy={y} r="4" fill="currentColor" opacity="0.8">
+            <animate attributeName="r" values="4;7;4" dur="2.4s" repeatCount="indefinite" />
+          </circle>
+        ))}
+      </svg>
+    );
+  }
+  if (kind === "k8s") {
+    const pods = [[90,90],[200,70],[310,90],[90,200],[200,220],[310,200]];
+    return (
+      <svg aria-hidden viewBox="0 0 400 280" className={`${common} text-primary`}>
+        {pods.flatMap((a, i) =>
+          pods.slice(i + 1).map(([bx, by], j) => (
+            <line key={`${i}-${j}`} x1={a[0]} y1={a[1]} x2={bx} y2={by} stroke="currentColor" strokeOpacity="0.15" strokeWidth="0.5" />
+          ))
+        )}
+        {pods.map(([x, y], i) => (
+          <g key={i}>
+            <circle cx={x} cy={y} r="6" fill="currentColor" opacity="0.85" />
+            <circle cx={x} cy={y} r="10" fill="none" stroke="currentColor" strokeOpacity="0.4">
+              <animate attributeName="r" values="6;18;6" dur={`${2 + (i % 3)}s`} repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.5;0;0.5" dur={`${2 + (i % 3)}s`} repeatCount="indefinite" />
+            </circle>
+          </g>
+        ))}
+      </svg>
+    );
+  }
+  if (kind === "tf") {
+    const nodes = [[60,140],[160,70],[160,210],[260,140],[360,80],[360,200]];
+    const edges: [number, number][] = [[0,1],[0,2],[1,3],[2,3],[3,4],[3,5]];
+    return (
+      <svg aria-hidden viewBox="0 0 400 280" className={`${common} text-primary`}>
+        {edges.map(([a,b], i) => {
+          const [x1,y1] = nodes[a], [x2,y2] = nodes[b];
+          return (
+            <g key={i}>
+              <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="currentColor" strokeOpacity="0.3" strokeWidth="1" />
+              <circle r="2.5" fill="currentColor">
+                <animate attributeName="cx" values={`${x1};${x2}`} dur={`${2 + i * 0.4}s`} repeatCount="indefinite" />
+                <animate attributeName="cy" values={`${y1};${y2}`} dur={`${2 + i * 0.4}s`} repeatCount="indefinite" />
+              </circle>
+            </g>
+          );
+        })}
+        {nodes.map(([x,y], i) => (
+          <rect key={i} x={x-7} y={y-7} width="14" height="14" rx="3" fill="currentColor" opacity="0.8" />
+        ))}
+      </svg>
+    );
+  }
+  if (kind === "mlops") {
+    return (
+      <svg aria-hidden viewBox="0 0 400 280" className={`${common} text-primary`}>
+        <path id="ml-p" d="M30 200 Q 120 60 200 140 T 370 80" stroke="currentColor" strokeOpacity="0.35" strokeWidth="1" fill="none" />
+        {["Data", "Train", "Registry", "Serve"].map((label, i) => {
+          const x = 30 + i * 113;
+          const y = i % 2 === 0 ? 200 : 110;
+          return (
+            <g key={label}>
+              <rect x={x - 26} y={y - 12} width="52" height="24" rx="6" fill="currentColor" opacity="0.15" />
+              <text x={x} y={y + 4} textAnchor="middle" fontSize="9" fill="currentColor" opacity="0.9" fontFamily="monospace">{label}</text>
+            </g>
+          );
+        })}
+        {[0, 0.6, 1.2].map((delay, i) => (
+          <circle key={i} r="3" fill="currentColor">
+            <animateMotion dur="4s" begin={`${delay}s`} repeatCount="indefinite"><mpath href="#ml-p" /></animateMotion>
+          </circle>
+        ))}
+      </svg>
+    );
+  }
+  // devsecops pipeline
+  const steps = ["commit", "build", "scan", "deploy"];
+  return (
+    <svg aria-hidden viewBox="0 0 400 280" className={`${common} text-primary`}>
+      <line x1="40" y1="140" x2="360" y2="140" stroke="currentColor" strokeOpacity="0.3" strokeDasharray="3 4" />
+      {steps.map((s, i) => {
+        const x = 40 + i * (320 / 3);
+        return (
+          <g key={s}>
+            <circle cx={x} cy={140} r="10" fill="currentColor" opacity="0.85" />
+            <circle cx={x} cy={140} r="14" fill="none" stroke="currentColor" strokeOpacity="0.5">
+              <animate attributeName="r" values="10;22;10" dur="3s" begin={`${i * 0.6}s`} repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.6;0;0.6" dur="3s" begin={`${i * 0.6}s`} repeatCount="indefinite" />
+            </circle>
+            <text x={x} y={170} textAnchor="middle" fontSize="9" fontFamily="monospace" fill="currentColor" opacity="0.8">{s}</text>
+          </g>
+        );
+      })}
+      <circle r="3.5" fill="currentColor">
+        <animate attributeName="cx" values="40;360" dur="4s" repeatCount="indefinite" />
+        <animate attributeName="cy" values="140;140" dur="4s" repeatCount="indefinite" />
+      </circle>
+    </svg>
+  );
+}
+
+/* ============================================================ */
+/*                   TERMINAL COMPONENT                         */
+/* ============================================================ */
+function CommandTerminal() {
+  const lines = [
+    { cmd: "terraform apply -auto-approve", out: "Apply complete! 37 added, 0 changed, 0 destroyed." },
+    { cmd: "kubectl get pods -n platform", out: "argocd-server-7c9f   1/1   Running   0   12d" },
+    { cmd: "argocd app sync platform", out: "Synced  →  Healthy" },
+    { cmd: "docker build -t platform/api:1.4.2 .", out: "Successfully tagged platform/api:1.4.2" },
+    { cmd: "gh workflow run release.yml", out: "✓ release.yml queued on main" },
+  ];
+  const [idx, setIdx] = useState(0);
+  const [typed, setTyped] = useState("");
+  const [showOut, setShowOut] = useState(false);
+
+  useEffect(() => {
+    const cmd = lines[idx].cmd;
+    setTyped("");
+    setShowOut(false);
+    let i = 0;
+    const typer = setInterval(() => {
+      i++;
+      setTyped(cmd.slice(0, i));
+      if (i >= cmd.length) {
+        clearInterval(typer);
+        setTimeout(() => setShowOut(true), 250);
+        setTimeout(() => setIdx((p) => (p + 1) % lines.length), 2600);
+      }
+    }, 45);
+    return () => clearInterval(typer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx]);
+
+  return (
+    <div className="relative overflow-hidden rounded-2xl hairline bg-[oklch(0.1_0.02_255)] shadow-[0_30px_80px_-30px_oklch(0_0_0/_70%)]">
+      <div className="flex items-center gap-2 border-b border-hairline px-4 py-2.5">
+        <span className="h-2.5 w-2.5 rounded-full bg-destructive/70" />
+        <span className="h-2.5 w-2.5 rounded-full bg-primary/70" />
+        <span className="h-2.5 w-2.5 rounded-full bg-accent/70" />
+        <span className="ml-3 font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+          ~/platform · zsh
+        </span>
+      </div>
+      <div className="space-y-2 p-5 font-mono text-[13px] leading-relaxed sm:text-sm">
+        {lines.slice(0, idx).map((l, i) => (
+          <div key={i} className="opacity-50">
+            <div><span className="text-primary">❯</span> {l.cmd}</div>
+            <div className="pl-3 text-muted-foreground">{l.out}</div>
+          </div>
+        ))}
+        <div>
+          <span className="text-primary">❯</span> {typed}
+          <span className="ml-0.5 inline-block h-4 w-1.5 -mb-0.5 animate-pulse bg-primary" />
+        </div>
+        {showOut && (
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="pl-3 text-muted-foreground"
+          >
+            {lines[idx].out}
+          </motion.div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================ */
+/*                   TECH MARQUEE (unused)                      */
 /* ============================================================ */
 function Marquee() {
   const items = [
