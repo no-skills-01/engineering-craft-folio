@@ -693,6 +693,7 @@ type Project = {
   image: string;
   github: string;
   docs: string;
+  flow: "cloud" | "k8s" | "tf" | "mlops" | "devsecops";
 };
 
 const PROJECTS: Project[] = [
@@ -711,6 +712,7 @@ const PROJECTS: Project[] = [
     image: projAws,
     github: "https://github.com/darshanatkari",
     docs: "#",
+    flow: "cloud",
   },
   {
     num: "02",
@@ -727,6 +729,7 @@ const PROJECTS: Project[] = [
     image: projK8s,
     github: "https://github.com/darshanatkari",
     docs: "#",
+    flow: "k8s",
   },
   {
     num: "03",
@@ -743,6 +746,7 @@ const PROJECTS: Project[] = [
     image: projTf,
     github: "https://github.com/darshanatkari",
     docs: "#",
+    flow: "tf",
   },
   {
     num: "04",
@@ -759,6 +763,7 @@ const PROJECTS: Project[] = [
     image: projMlops,
     github: "https://github.com/darshanatkari",
     docs: "#",
+    flow: "mlops",
   },
   {
     num: "05",
@@ -775,11 +780,84 @@ const PROJECTS: Project[] = [
     image: projDevsec,
     github: "https://github.com/darshanatkari",
     docs: "#",
+    flow: "devsecops",
   },
 ];
 
-function ProjectRow({ p, i }: { p: Project; i: number }) {
-  const flip = i % 2 === 1;
+function ProjectRow({ p, i, featured = false }: { p: Project; i: number; featured?: boolean }) {
+  const flip = !featured && i % 2 === 1;
+  if (featured) {
+    return (
+      <motion.article
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        className="relative"
+      >
+        <div className="mb-6 flex items-center gap-3">
+          <span className="rounded-full bg-primary px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-primary-foreground">
+            Flagship
+          </span>
+          <span className="font-mono text-xs text-primary">{p.num}</span>
+          <div className="h-px flex-1 bg-gradient-to-r from-primary/40 to-transparent" />
+        </div>
+        <div className="group relative overflow-hidden rounded-[2rem] hairline bg-surface">
+          <div className="absolute -inset-px -z-10 rounded-[2rem] bg-gradient-to-br from-primary/40 via-accent/15 to-transparent opacity-70" />
+          <div className="relative aspect-[21/10] overflow-hidden">
+            <img
+              src={p.image}
+              alt={`${p.title} — architecture visual`}
+              loading="eager"
+              className="h-full w-full object-cover transition duration-[1200ms] group-hover:scale-[1.02]"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+            <ProjectFlowOverlay kind={p.flow} />
+            <div className="absolute left-5 top-5 flex items-center gap-2 rounded-full glass hairline px-3 py-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                {p.kicker}
+              </span>
+            </div>
+            <div className="absolute inset-x-0 bottom-0 grid grid-cols-1 gap-6 p-6 md:grid-cols-12 md:gap-10 md:p-10">
+              <div className="md:col-span-7">
+                <h3 className="font-display text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl md:text-5xl">
+                  {p.title}
+                </h3>
+                <p className="mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">{p.summary}</p>
+              </div>
+              <div className="md:col-span-5">
+                <ul className="space-y-1.5">
+                  {p.outcomes.map((o) => (
+                    <li key={o} className="flex items-start gap-2 text-sm text-foreground/85">
+                      <span className="mt-2 h-1 w-1 rounded-full bg-primary" />
+                      {o}
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                  {p.tech.map((t) => (
+                    <span key={t} className="rounded-full hairline bg-surface/80 px-2.5 py-0.5 font-mono text-[11px] text-muted-foreground">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <a href={p.github} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-foreground/95 px-4 py-2 text-xs font-semibold text-background transition hover:bg-foreground">
+                    <Github className="h-3.5 w-3.5" /> GitHub
+                  </a>
+                  <a href={p.docs} className="inline-flex items-center gap-2 rounded-full hairline glass px-4 py-2 text-xs font-medium transition hover:bg-surface-elevated">
+                    <FileText className="h-3.5 w-3.5" /> Documentation
+                    <ArrowUpRight className="h-3 w-3 opacity-60" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.article>
+    );
+  }
   return (
     <motion.article
       initial={{ opacity: 0, y: 40 }}
@@ -802,6 +880,7 @@ function ProjectRow({ p, i }: { p: Project; i: number }) {
               className="h-full w-full object-cover transition duration-[1200ms] group-hover:scale-[1.03]"
             />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/70 via-background/0 to-background/0" />
+            <ProjectFlowOverlay kind={p.flow} />
             <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full glass hairline px-2.5 py-1">
               <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                 {p.kicker}
