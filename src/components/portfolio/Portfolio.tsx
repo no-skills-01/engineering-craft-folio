@@ -1080,13 +1080,14 @@ function SectionLabel({ index, title }: { index: string; title: string }) {
 /* ============================================================ */
 function Domains() {
   const domains = [
-    { icon: Cloud, name: "Cloud Architecture", desc: "Well-architected, multi-account AWS landing zones with cost and security baselines.", tag: "Design" },
+    { icon: Cloud, name: "Cloud Architecture", desc: "Multi-cloud landing zones, network topology, cost and security baselines.", tag: "Design" },
     { icon: Boxes, name: "Infrastructure as Code", desc: "Reusable Terraform modules, GitOps workflows, drift-free environments.", tag: "Automate" },
-    { icon: Container, name: "Cloud Native", desc: "Kubernetes, Helm, service mesh, progressive delivery with Argo.", tag: "Run" },
+    { icon: Container, name: "Containers", desc: "Kubernetes, Helm, service mesh, progressive delivery with Argo.", tag: "Run" },
     { icon: ShieldCheck, name: "DevSecOps", desc: "Shift-left security, SAST, SCA, secrets scanning and policy as code.", tag: "Secure" },
-    { icon: Brain, name: "MLOps", desc: "Model registries, reproducible pipelines, KServe-based serving.", tag: "Ship" },
     { icon: Activity, name: "Observability", desc: "Metrics, logs and traces unified with OpenTelemetry and Grafana.", tag: "See" },
+    { icon: Brain, name: "MLOps", desc: "Model registries, reproducible pipelines, KServe-based serving.", tag: "Ship" },
   ];
+  const [active, setActive] = useState<number | null>(null);
 
   return (
     <section id="domains" className="section-pad relative overflow-hidden">
@@ -1103,63 +1104,76 @@ function Domains() {
               <span className="text-muted-foreground">One operating model.</span>
             </h2>
             <p className="mt-4 max-w-md text-sm text-muted-foreground">
-              Every domain feeds the next — from how infrastructure is described, to how it is secured,
-              observed and evolved.
+              Every domain feeds the next — a connected pipeline from design through deployment,
+              security, observation and intelligence.
             </p>
           </div>
 
-          {/* Constellation layout */}
+          {/* Connected pipeline layout */}
           <div className="md:col-span-8">
-            <div className="relative">
-              {/* connector svg */}
-              <svg
-                aria-hidden
-                viewBox="0 0 800 600"
-                className="pointer-events-none absolute inset-0 h-full w-full opacity-50"
-              >
-                <defs>
-                  <linearGradient id="ln" x1="0" x2="1">
-                    <stop offset="0" stopColor="currentColor" stopOpacity="0" />
-                    <stop offset="0.5" stopColor="currentColor" stopOpacity="0.6" />
-                    <stop offset="1" stopColor="currentColor" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <g className="text-primary" stroke="url(#ln)" strokeWidth="1" fill="none">
-                  <path d="M120,90 C300,150 500,150 680,90" />
-                  <path d="M120,300 C300,260 500,260 680,300" />
-                  <path d="M120,510 C300,460 500,460 680,510" />
-                  <path d="M120,90 C200,300 200,300 120,510" />
-                  <path d="M680,90 C600,300 600,300 680,510" />
-                </g>
-              </svg>
-
-              <div className="relative grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {domains.map((d, i) => (
-                  <motion.div
+            <ol className="relative grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {domains.map((d, i) => {
+                const isActive = active === i;
+                const isLinked = active !== null && (active === i - 1 || active === i + 1);
+                return (
+                  <motion.li
                     key={d.name}
                     initial={{ opacity: 0, y: 16 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-60px" }}
                     transition={{ duration: 0.5, delay: i * 0.06 }}
-                    className={`group relative overflow-hidden rounded-2xl hairline bg-surface/70 p-5 transition hover:bg-surface-elevated ${
-                      i % 3 === 0 ? "sm:translate-y-3" : i % 3 === 2 ? "sm:-translate-y-3" : ""
+                    onMouseEnter={() => setActive(i)}
+                    onMouseLeave={() => setActive(null)}
+                    className={`group relative overflow-hidden rounded-2xl hairline bg-surface/70 p-5 transition-all duration-500 ${
+                      isActive
+                        ? "bg-surface-elevated shadow-[0_0_40px_-10px_oklch(0.7_0.18_240/_60%)] ring-1 ring-primary/40"
+                        : isLinked
+                          ? "bg-surface ring-1 ring-primary/20"
+                          : "hover:bg-surface-elevated"
                     }`}
                   >
+                    {/* connector arrow to next */}
+                    {i < domains.length - 1 && (
+                      <span
+                        aria-hidden
+                        className={`absolute -right-2 top-1/2 z-10 hidden -translate-y-1/2 font-mono text-[10px] transition sm:inline ${
+                          isActive || active === i + 1 ? "text-primary" : "text-primary/40"
+                        }`}
+                      >
+                        {i % 2 === 0 ? "→" : "↓"}
+                      </span>
+                    )}
                     <div className="flex items-center justify-between">
-                      <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+                      <div className={`relative grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary transition ${isActive ? "bg-primary/25 shadow-[0_0_24px_-4px_oklch(0.7_0.18_240/_80%)]" : ""}`}>
                         <d.icon className="h-5 w-5" />
                       </div>
-                      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                        {d.tag}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                          step · 0{i + 1}
+                        </span>
+                        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary/80">
+                          {d.tag}
+                        </span>
+                      </div>
                     </div>
                     <h3 className="mt-4 font-display text-lg font-semibold tracking-tight">{d.name}</h3>
                     <p className="mt-1.5 text-sm text-muted-foreground">{d.desc}</p>
-                    <div className="pointer-events-none absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 transition group-hover:opacity-100" />
-                  </motion.div>
-                ))}
-              </div>
-            </div>
+                    {/* flowing packet on hover */}
+                    <svg
+                      aria-hidden
+                      viewBox="0 0 300 80"
+                      preserveAspectRatio="none"
+                      className={`pointer-events-none mt-4 h-6 w-full text-primary transition-opacity duration-500 ${isActive || isLinked ? "opacity-100" : "opacity-30"}`}
+                    >
+                      <path id={`dm-p-${i}`} d="M0 40 C 80 10 220 70 300 40" fill="none" stroke="currentColor" strokeOpacity="0.45" strokeWidth="0.8" strokeDasharray="2 4" />
+                      <circle r="1.8" fill="currentColor">
+                        <animateMotion dur="3.5s" repeatCount="indefinite"><mpath href={`#dm-p-${i}`} /></animateMotion>
+                      </circle>
+                    </svg>
+                  </motion.li>
+                );
+              })}
+            </ol>
           </div>
         </div>
       </div>
@@ -1306,6 +1320,15 @@ function ProjectRow({ p, i, featured = false }: { p: Project; i: number; feature
                 {p.kicker}
               </span>
             </div>
+            <div className="absolute right-5 top-5 flex items-center gap-2 rounded-full hairline bg-background/60 px-3 py-1.5 backdrop-blur">
+              <span className="relative grid h-2 w-2 place-items-center">
+                <span className="absolute h-2 w-2 animate-ping rounded-full bg-primary/50" />
+                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                Interactive Infrastructure View · Coming soon
+              </span>
+            </div>
             <div className="absolute inset-x-0 bottom-0 grid grid-cols-1 gap-6 p-6 md:grid-cols-12 md:gap-10 md:p-10">
               <div className="md:col-span-7">
                 <h3 className="font-display text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl md:text-5xl">
@@ -1371,6 +1394,12 @@ function ProjectRow({ p, i, featured = false }: { p: Project; i: number; feature
             <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full glass hairline px-2.5 py-1">
               <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                 {p.kicker}
+              </span>
+            </div>
+            <div className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full hairline bg-background/55 px-2.5 py-1 backdrop-blur">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                Architecture diagram · soon
               </span>
             </div>
           </div>
@@ -1519,13 +1548,20 @@ function Stack() {
               {groups.map((g, i) => (
                 <motion.div
                   key={g.name}
-                  initial={{ opacity: 0, y: 12 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.04 }}
-                  className="group grid grid-cols-[120px_1fr] items-baseline gap-6 py-5 sm:grid-cols-[180px_1fr]"
+                  initial={{ opacity: 0, x: -12 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.55, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] }}
+                  className="group relative grid grid-cols-[120px_1fr] items-center gap-6 py-5 transition-colors sm:grid-cols-[200px_1fr] hover:bg-surface/40"
                 >
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute left-0 top-1/2 h-px w-0 -translate-y-1/2 bg-gradient-to-r from-primary via-primary/40 to-transparent transition-all duration-500 group-hover:w-full"
+                  />
                   <div className="flex items-center gap-3">
+                    <span className="grid h-7 w-7 place-items-center rounded-md bg-primary/10 text-primary transition group-hover:bg-primary/20 group-hover:shadow-[0_0_18px_-2px_oklch(0.7_0.18_240/_80%)]">
+                      <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                    </span>
                     <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                       0{i + 1}
                     </span>
@@ -1533,12 +1569,13 @@ function Stack() {
                   </div>
                   <div className="flex flex-wrap gap-x-5 gap-y-2">
                     {g.items.map((it) => (
-                      <span
+                      <motion.span
                         key={it}
-                        className="text-base text-foreground/80 transition group-hover:text-foreground"
+                        whileHover={{ y: -1 }}
+                        className="rounded-full px-1 text-base text-foreground/80 transition hover:text-primary group-hover:text-foreground"
                       >
                         {it}
-                      </span>
+                      </motion.span>
                     ))}
                   </div>
                 </motion.div>
@@ -1667,8 +1704,8 @@ function GitHubSection() {
         <div className="absolute right-0 top-0 h-[500px] w-[500px] rounded-full bg-primary/8 blur-[140px]" />
       </div>
       <div className="mx-auto max-w-6xl px-6">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-12 md:items-center">
-          <div className="md:col-span-5">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
+          <div className="md:col-span-5 md:sticky md:top-28 md:self-start">
             <SectionLabel index="06" title="GitHub" />
             <h2 className="mt-6 font-display text-balance text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
               Built in the open.
@@ -1688,41 +1725,29 @@ function GitHubSection() {
                 @darshanatkari
               </a>
             </div>
-          </div>
-
-          <div className="md:col-span-7">
-            {data ? (
-              <div className="grid grid-cols-2 gap-3">
-                {stats.map((s, i) => (
-                  <motion.div
-                    key={s.label}
-                    initial={{ opacity: 0, y: 16 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: i * 0.07 }}
-                    className="relative overflow-hidden rounded-2xl hairline bg-surface/70 p-5"
-                  >
-                    <s.icon className="h-4 w-4 text-primary" />
-                    <div className="mt-6 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-                      {s.value}
+            {data && (
+              <div className="mt-7 grid grid-cols-2 gap-3">
+                {stats.map((s) => (
+                  <div key={s.label} className="rounded-xl hairline bg-surface/60 p-3">
+                    <div className="flex items-center gap-2 text-primary">
+                      <s.icon className="h-3.5 w-3.5" />
+                      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">live</span>
                     </div>
-                    <div className="mt-1 text-xs text-muted-foreground">{s.label}</div>
-                    <span className="absolute right-3 top-3 font-mono text-[10px] uppercase tracking-[0.18em] text-primary/70">
-                      live
-                    </span>
-                  </motion.div>
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-3">
-                {[0, 1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="h-32 animate-pulse rounded-2xl hairline bg-surface/50"
-                  />
+                    <div className="mt-1 font-display text-2xl font-semibold tracking-tight">{s.value}</div>
+                    <div className="text-[11px] text-muted-foreground">{s.label}</div>
+                  </div>
                 ))}
               </div>
             )}
+          </div>
+
+          <div className="md:col-span-7 space-y-6">
+            <RepoCards />
+            <ContributionHeatmap />
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <LatestDeployments />
+              <LatestCommits />
+            </div>
           </div>
         </div>
       </div>
@@ -1730,14 +1755,218 @@ function GitHubSection() {
   );
 }
 
+/* ---------- GITHUB PLACEHOLDER WIDGETS ---------- */
+function RepoCards() {
+  const repos = [
+    { name: "aws-cloud-portfolio", desc: "Production-style AWS workloads with diagrams, IaC and runbooks.", lang: "Terraform", color: "oklch(0.7 0.18 240)", stars: 24 },
+    { name: "k8s-platform-blueprint", desc: "GitOps reference platform: ArgoCD, Rollouts, Prometheus.", lang: "Helm", color: "oklch(0.82 0.14 210)", stars: 18 },
+    { name: "terraform-modules", desc: "Composable Terraform modules with policy-as-code in CI.", lang: "HCL", color: "oklch(0.65 0.18 270)", stars: 31 },
+    { name: "devsecops-actions", desc: "Hardened GitHub Actions: SAST, SCA, scanning, signing.", lang: "YAML", color: "oklch(0.7 0.15 180)", stars: 12 },
+  ];
+  return (
+    <div>
+      <SectionMini label="Pinned repositories" />
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {repos.map((r, i) => (
+          <motion.a
+            key={r.name}
+            href={`https://github.com/darshanatkari/${r.name}`}
+            target="_blank"
+            rel="noreferrer"
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.5, delay: i * 0.05 }}
+            className="group relative overflow-hidden rounded-2xl hairline bg-surface/60 p-4 transition hover:bg-surface-elevated"
+          >
+            <div className="flex items-center gap-2">
+              <GitBranch className="h-3.5 w-3.5 text-primary" />
+              <span className="font-mono text-sm font-medium text-foreground">{r.name}</span>
+              <span className="ml-auto inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+                <Star className="h-3 w-3" /> {r.stars}
+              </span>
+            </div>
+            <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">{r.desc}</p>
+            <div className="mt-3 flex items-center gap-2 text-[11px] text-muted-foreground">
+              <span className="h-2 w-2 rounded-full" style={{ background: r.color }} />
+              <span className="font-mono">{r.lang}</span>
+              <span className="ml-auto font-mono text-primary/70">placeholder</span>
+            </div>
+            <span className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 transition group-hover:opacity-100" />
+          </motion.a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ContributionHeatmap() {
+  // 7 rows × 24 cols; deterministic pseudo-random
+  const cells: number[] = [];
+  let seed = 7;
+  for (let i = 0; i < 7 * 24; i++) {
+    seed = (seed * 9301 + 49297) % 233280;
+    cells.push(seed / 233280);
+  }
+  const level = (v: number) =>
+    v < 0.35 ? 0 : v < 0.6 ? 1 : v < 0.8 ? 2 : v < 0.93 ? 3 : 4;
+  const op = ["0.06", "0.22", "0.45", "0.7", "0.95"];
+  return (
+    <div>
+      <SectionMini label="Contribution activity · last 24 weeks" />
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-40px" }}
+        transition={{ duration: 0.6 }}
+        className="mt-3 rounded-2xl hairline bg-surface/60 p-4"
+      >
+        <div className="grid grid-rows-7 grid-flow-col gap-[3px]">
+          {cells.map((v, i) => (
+            <span
+              key={i}
+              className="h-2.5 w-2.5 rounded-[3px] bg-primary"
+              style={{ opacity: op[level(v)] }}
+            />
+          ))}
+        </div>
+        <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
+          <span className="font-mono">less</span>
+          <div className="flex items-center gap-1">
+            {op.map((o, idx) => (
+              <span key={idx} className="h-2.5 w-2.5 rounded-[3px] bg-primary" style={{ opacity: o }} />
+            ))}
+          </div>
+          <span className="font-mono">more</span>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+function LatestDeployments() {
+  const items = [
+    { env: "production", svc: "platform-api", v: "1.4.2", status: "Synced" },
+    { env: "staging", svc: "ml-serving", v: "0.9.1", status: "Healthy" },
+    { env: "production", svc: "ingress-gw", v: "2.1.0", status: "Synced" },
+    { env: "preview", svc: "docs-site", v: "1.0.7", status: "Running" },
+  ];
+  return (
+    <div>
+      <SectionMini label="Latest deployments" />
+      <ul className="mt-3 divide-y divide-hairline overflow-hidden rounded-2xl hairline bg-surface/60">
+        {items.map((d, i) => (
+          <motion.li
+            key={d.svc + i}
+            initial={{ opacity: 0, x: -8 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: i * 0.05 }}
+            className="flex items-center gap-3 px-4 py-3 text-[13px]"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_oklch(0.7_0.18_240/_90%)]" />
+            <span className="font-mono text-foreground/85">{d.svc}</span>
+            <span className="font-mono text-[11px] text-muted-foreground">{d.v}</span>
+            <span className="ml-auto font-mono text-[10px] uppercase tracking-[0.18em] text-primary/80">{d.env}</span>
+          </motion.li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function LatestCommits() {
+  const items = [
+    { msg: "feat(argocd): wire blue/green hook for ml-serving", time: "2h" },
+    { msg: "chore(terraform): bump vpc module to 5.4.0", time: "1d" },
+    { msg: "fix(otel): drop high-cardinality span attrs", time: "3d" },
+    { msg: "ci: sign container images via cosign keyless", time: "5d" },
+  ];
+  return (
+    <div>
+      <SectionMini label="Latest commits" />
+      <ul className="mt-3 divide-y divide-hairline overflow-hidden rounded-2xl hairline bg-surface/60">
+        {items.map((c, i) => (
+          <motion.li
+            key={i}
+            initial={{ opacity: 0, x: -8 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: i * 0.05 }}
+            className="flex items-center gap-3 px-4 py-3 text-[13px]"
+          >
+            <GitBranch className="h-3.5 w-3.5 text-primary shrink-0" />
+            <span className="truncate font-mono text-foreground/85">{c.msg}</span>
+            <span className="ml-auto font-mono text-[11px] text-muted-foreground">{c.time}</span>
+          </motion.li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function SectionMini({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+      <span className="h-1 w-1 rounded-full bg-primary" />
+      {label}
+    </div>
+  );
+}
+
 /* ============================================================ */
 /*                        CONTACT                               */
 /* ============================================================ */
 function Contact() {
+  return ContactInner();
+}
+function ContactParticles() {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 1200 600"
+      preserveAspectRatio="xMidYMid slice"
+      className="absolute inset-0 h-full w-full text-primary"
+      style={{
+        maskImage: "radial-gradient(ellipse 70% 60% at 50% 50%, black 30%, transparent 90%)",
+        WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 50%, black 30%, transparent 90%)",
+        opacity: 0.35,
+      }}
+    >
+      <defs>
+        <linearGradient id="ct-ln" x1="0" x2="1">
+          <stop offset="0" stopColor="currentColor" stopOpacity="0" />
+          <stop offset="0.5" stopColor="currentColor" stopOpacity="0.5" />
+          <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      {[100, 220, 380, 500].map((y, i) => (
+        <g key={y}>
+          <path id={`ct-p-${i}`} d={`M0 ${y} C 300 ${y - 40} 900 ${y + 40} 1200 ${y}`} fill="none" stroke="url(#ct-ln)" strokeWidth="0.8" />
+          <circle r="1.6" fill="currentColor">
+            <animateMotion dur={`${9 + i * 1.6}s`} repeatCount="indefinite"><mpath href={`#ct-p-${i}`} /></animateMotion>
+            <animate attributeName="opacity" values="0;0.9;0" dur={`${9 + i * 1.6}s`} repeatCount="indefinite" />
+          </circle>
+        </g>
+      ))}
+      {[[200,180],[420,120],[760,260],[980,200],[300,420],[680,460],[900,380]].map(([x,y],i)=>(
+        <g key={i}>
+          <circle cx={x} cy={y} r="1.4" fill="currentColor" opacity="0.85" />
+          <circle cx={x} cy={y} r="5" fill="none" stroke="currentColor" strokeOpacity="0.4">
+            <animate attributeName="r" values="1.4;10;1.4" dur={`${4 + (i % 3)}s`} repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.5;0;0.5" dur={`${4 + (i % 3)}s`} repeatCount="indefinite" />
+          </circle>
+        </g>
+      ))}
+    </svg>
+  );
+}
+function ContactInner() {
   return (
     <section id="contact" className="section-pad relative overflow-hidden border-t border-hairline">
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/2 top-1/2 h-[800px] w-[1200px] -translate-x-1/2 -translate-y-1/2 amber-glow" />
+        <div className="absolute left-1/2 top-1/2 h-[800px] w-[1200px] -translate-x-1/2 -translate-y-1/2 amber-glow opacity-70" />
+        <ContactParticles />
       </div>
       <div className="mx-auto max-w-4xl px-6 text-center">
         <SectionLabel index="07" title="Contact" />
@@ -1781,17 +2010,51 @@ function Contact() {
 function Footer() {
   return (
     <footer className="border-t border-hairline">
-      <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 px-6 py-8 sm:flex-row sm:items-center">
-        <div className="flex items-center gap-2.5">
-          <span className="grid h-6 w-6 place-items-center rounded-full bg-primary/15 text-primary font-display text-xs font-bold">
-            DA
-          </span>
-          <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-            Darshan Atkari · © {new Date().getFullYear()}
-          </span>
+      <div className="mx-auto max-w-6xl px-6 py-12">
+        <div className="flex items-center gap-3 font-mono text-[12px]">
+          <span className="text-primary">❯</span>
+          <span className="text-foreground/85">kubectl get engineer</span>
+          <span className="ml-2 inline-block h-3.5 w-1 animate-pulse bg-primary" />
         </div>
-        <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-          Designed & engineered with intent.
+        <div className="mt-5 overflow-x-auto rounded-2xl hairline bg-surface/50">
+          <table className="w-full min-w-[640px] font-mono text-[12px]">
+            <thead>
+              <tr className="border-b border-hairline text-left text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                <th className="px-5 py-3 font-normal">NAME</th>
+                <th className="px-5 py-3 font-normal">STATUS</th>
+                <th className="px-5 py-3 font-normal">ROLE</th>
+                <th className="px-5 py-3 font-normal">AVAILABILITY</th>
+                <th className="px-5 py-3 font-normal">AGE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="text-foreground/85">
+                <td className="px-5 py-3">darshan-atkari</td>
+                <td className="px-5 py-3">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_oklch(0.7_0.18_240/_90%)]" />
+                    Ready
+                  </span>
+                </td>
+                <td className="px-5 py-3 text-muted-foreground">Cloud · DevOps · SRE · MLOps</td>
+                <td className="px-5 py-3 text-primary/90">Open to Opportunities</td>
+                <td className="px-5 py-3 text-muted-foreground">∞</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-6 flex flex-col items-start justify-between gap-3 text-[11px] sm:flex-row sm:items-center">
+          <div className="flex items-center gap-2.5">
+            <span className="grid h-6 w-6 place-items-center rounded-full bg-primary/15 text-primary font-display text-xs font-bold">
+              DA
+            </span>
+            <span className="font-mono uppercase tracking-[0.22em] text-muted-foreground">
+              Darshan Atkari · © {new Date().getFullYear()}
+            </span>
+          </div>
+          <div className="font-mono uppercase tracking-[0.22em] text-muted-foreground">
+            Designed &amp; engineered with intent.
+          </div>
         </div>
       </div>
     </footer>
