@@ -1704,8 +1704,8 @@ function GitHubSection() {
         <div className="absolute right-0 top-0 h-[500px] w-[500px] rounded-full bg-primary/8 blur-[140px]" />
       </div>
       <div className="mx-auto max-w-6xl px-6">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-12 md:items-center">
-          <div className="md:col-span-5">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
+          <div className="md:col-span-5 md:sticky md:top-28 md:self-start">
             <SectionLabel index="06" title="GitHub" />
             <h2 className="mt-6 font-display text-balance text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
               Built in the open.
@@ -1725,45 +1725,192 @@ function GitHubSection() {
                 @darshanatkari
               </a>
             </div>
-          </div>
-
-          <div className="md:col-span-7">
-            {data ? (
-              <div className="grid grid-cols-2 gap-3">
-                {stats.map((s, i) => (
-                  <motion.div
-                    key={s.label}
-                    initial={{ opacity: 0, y: 16 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: i * 0.07 }}
-                    className="relative overflow-hidden rounded-2xl hairline bg-surface/70 p-5"
-                  >
-                    <s.icon className="h-4 w-4 text-primary" />
-                    <div className="mt-6 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-                      {s.value}
+            {data && (
+              <div className="mt-7 grid grid-cols-2 gap-3">
+                {stats.map((s) => (
+                  <div key={s.label} className="rounded-xl hairline bg-surface/60 p-3">
+                    <div className="flex items-center gap-2 text-primary">
+                      <s.icon className="h-3.5 w-3.5" />
+                      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">live</span>
                     </div>
-                    <div className="mt-1 text-xs text-muted-foreground">{s.label}</div>
-                    <span className="absolute right-3 top-3 font-mono text-[10px] uppercase tracking-[0.18em] text-primary/70">
-                      live
-                    </span>
-                  </motion.div>
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-3">
-                {[0, 1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="h-32 animate-pulse rounded-2xl hairline bg-surface/50"
-                  />
+                    <div className="mt-1 font-display text-2xl font-semibold tracking-tight">{s.value}</div>
+                    <div className="text-[11px] text-muted-foreground">{s.label}</div>
+                  </div>
                 ))}
               </div>
             )}
           </div>
+
+          <div className="md:col-span-7 space-y-6">
+            <RepoCards />
+            <ContributionHeatmap />
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <LatestDeployments />
+              <LatestCommits />
+            </div>
+          </div>
         </div>
       </div>
     </section>
+  );
+}
+
+/* ---------- GITHUB PLACEHOLDER WIDGETS ---------- */
+function RepoCards() {
+  const repos = [
+    { name: "aws-cloud-portfolio", desc: "Production-style AWS workloads with diagrams, IaC and runbooks.", lang: "Terraform", color: "oklch(0.7 0.18 240)", stars: 24 },
+    { name: "k8s-platform-blueprint", desc: "GitOps reference platform: ArgoCD, Rollouts, Prometheus.", lang: "Helm", color: "oklch(0.82 0.14 210)", stars: 18 },
+    { name: "terraform-modules", desc: "Composable Terraform modules with policy-as-code in CI.", lang: "HCL", color: "oklch(0.65 0.18 270)", stars: 31 },
+    { name: "devsecops-actions", desc: "Hardened GitHub Actions: SAST, SCA, scanning, signing.", lang: "YAML", color: "oklch(0.7 0.15 180)", stars: 12 },
+  ];
+  return (
+    <div>
+      <SectionMini label="Pinned repositories" />
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {repos.map((r, i) => (
+          <motion.a
+            key={r.name}
+            href={`https://github.com/darshanatkari/${r.name}`}
+            target="_blank"
+            rel="noreferrer"
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.5, delay: i * 0.05 }}
+            className="group relative overflow-hidden rounded-2xl hairline bg-surface/60 p-4 transition hover:bg-surface-elevated"
+          >
+            <div className="flex items-center gap-2">
+              <GitBranch className="h-3.5 w-3.5 text-primary" />
+              <span className="font-mono text-sm font-medium text-foreground">{r.name}</span>
+              <span className="ml-auto inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+                <Star className="h-3 w-3" /> {r.stars}
+              </span>
+            </div>
+            <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">{r.desc}</p>
+            <div className="mt-3 flex items-center gap-2 text-[11px] text-muted-foreground">
+              <span className="h-2 w-2 rounded-full" style={{ background: r.color }} />
+              <span className="font-mono">{r.lang}</span>
+              <span className="ml-auto font-mono text-primary/70">placeholder</span>
+            </div>
+            <span className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 transition group-hover:opacity-100" />
+          </motion.a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ContributionHeatmap() {
+  // 7 rows × 24 cols; deterministic pseudo-random
+  const cells: number[] = [];
+  let seed = 7;
+  for (let i = 0; i < 7 * 24; i++) {
+    seed = (seed * 9301 + 49297) % 233280;
+    cells.push(seed / 233280);
+  }
+  const level = (v: number) =>
+    v < 0.35 ? 0 : v < 0.6 ? 1 : v < 0.8 ? 2 : v < 0.93 ? 3 : 4;
+  const op = ["0.06", "0.22", "0.45", "0.7", "0.95"];
+  return (
+    <div>
+      <SectionMini label="Contribution activity · last 24 weeks" />
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-40px" }}
+        transition={{ duration: 0.6 }}
+        className="mt-3 rounded-2xl hairline bg-surface/60 p-4"
+      >
+        <div className="grid grid-rows-7 grid-flow-col gap-[3px]">
+          {cells.map((v, i) => (
+            <span
+              key={i}
+              className="h-2.5 w-2.5 rounded-[3px] bg-primary"
+              style={{ opacity: op[level(v)] }}
+            />
+          ))}
+        </div>
+        <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
+          <span className="font-mono">less</span>
+          <div className="flex items-center gap-1">
+            {op.map((o, idx) => (
+              <span key={idx} className="h-2.5 w-2.5 rounded-[3px] bg-primary" style={{ opacity: o }} />
+            ))}
+          </div>
+          <span className="font-mono">more</span>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+function LatestDeployments() {
+  const items = [
+    { env: "production", svc: "platform-api", v: "1.4.2", status: "Synced" },
+    { env: "staging", svc: "ml-serving", v: "0.9.1", status: "Healthy" },
+    { env: "production", svc: "ingress-gw", v: "2.1.0", status: "Synced" },
+    { env: "preview", svc: "docs-site", v: "1.0.7", status: "Running" },
+  ];
+  return (
+    <div>
+      <SectionMini label="Latest deployments" />
+      <ul className="mt-3 divide-y divide-hairline overflow-hidden rounded-2xl hairline bg-surface/60">
+        {items.map((d, i) => (
+          <motion.li
+            key={d.svc + i}
+            initial={{ opacity: 0, x: -8 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: i * 0.05 }}
+            className="flex items-center gap-3 px-4 py-3 text-[13px]"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_oklch(0.7_0.18_240/_90%)]" />
+            <span className="font-mono text-foreground/85">{d.svc}</span>
+            <span className="font-mono text-[11px] text-muted-foreground">{d.v}</span>
+            <span className="ml-auto font-mono text-[10px] uppercase tracking-[0.18em] text-primary/80">{d.env}</span>
+          </motion.li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function LatestCommits() {
+  const items = [
+    { msg: "feat(argocd): wire blue/green hook for ml-serving", time: "2h" },
+    { msg: "chore(terraform): bump vpc module to 5.4.0", time: "1d" },
+    { msg: "fix(otel): drop high-cardinality span attrs", time: "3d" },
+    { msg: "ci: sign container images via cosign keyless", time: "5d" },
+  ];
+  return (
+    <div>
+      <SectionMini label="Latest commits" />
+      <ul className="mt-3 divide-y divide-hairline overflow-hidden rounded-2xl hairline bg-surface/60">
+        {items.map((c, i) => (
+          <motion.li
+            key={i}
+            initial={{ opacity: 0, x: -8 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: i * 0.05 }}
+            className="flex items-center gap-3 px-4 py-3 text-[13px]"
+          >
+            <GitBranch className="h-3.5 w-3.5 text-primary shrink-0" />
+            <span className="truncate font-mono text-foreground/85">{c.msg}</span>
+            <span className="ml-auto font-mono text-[11px] text-muted-foreground">{c.time}</span>
+          </motion.li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function SectionMini({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+      <span className="h-1 w-1 rounded-full bg-primary" />
+      {label}
+    </div>
   );
 }
 
