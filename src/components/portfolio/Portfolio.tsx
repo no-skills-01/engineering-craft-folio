@@ -43,6 +43,148 @@ const stagger: Variants = {
 /* ============================================================ */
 /*                         NAV                                  */
 /* ============================================================ */
+/* ---------- BOOT SEQUENCE ---------- */
+function BootSequence() {
+  const steps = [
+    "Initializing infrastructure",
+    "Loading configuration",
+    "Starting control plane",
+    "Scheduling workloads",
+    "Provisioning containers",
+    "Deploying services",
+    "Collecting telemetry",
+    "Cluster status: ready",
+  ];
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setI((p) => Math.min(p + 1, steps.length - 1)), 280);
+    return () => clearInterval(id);
+  }, [steps.length]);
+  const progress = ((i + 1) / steps.length) * 100;
+  return (
+    <motion.div
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="fixed inset-0 z-[100] grid place-items-center bg-background"
+    >
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/15 blur-[140px]" />
+      </div>
+      <div className="relative w-full max-w-md px-6">
+        <div className="flex items-center gap-3">
+          <span className="grid h-9 w-9 place-items-center rounded-full bg-primary/15 text-primary font-display text-sm font-bold">
+            DA
+          </span>
+          <div className="font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+            cluster · bootstrap
+          </div>
+        </div>
+        <div className="mt-8 h-px w-full overflow-hidden rounded-full bg-hairline">
+          <motion.div
+            className="h-full bg-primary shadow-[0_0_20px_oklch(0.7_0.18_240/_80%)]"
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+          />
+        </div>
+        <ul className="mt-6 space-y-1.5 font-mono text-[12px] leading-relaxed">
+          {steps.slice(0, i + 1).map((s, idx) => {
+            const done = idx < i || i === steps.length - 1;
+            return (
+              <motion.li
+                key={s}
+                initial={{ opacity: 0, x: -6 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-center gap-2"
+              >
+                <span
+                  className={`inline-block h-1.5 w-1.5 rounded-full ${
+                    done ? "bg-primary shadow-[0_0_8px_oklch(0.7_0.18_240/_90%)]" : "bg-primary/40"
+                  }`}
+                />
+                <span className={done ? "text-foreground/85" : "text-muted-foreground"}>
+                  {s}
+                  {!done && idx === i && <span className="ml-1 animate-pulse text-primary">…</span>}
+                  {done && idx === steps.length - 1 && (
+                    <span className="ml-2 text-primary">✓</span>
+                  )}
+                </span>
+              </motion.li>
+            );
+          })}
+        </ul>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ---------- FLOATING HERO LABELS ---------- */
+function FloatingLabels() {
+  const labels = [
+    { t: "Control Plane", x: "-12%", y: "8%", d: 0 },
+    { t: "Cluster Ready", x: "92%", y: "4%", d: 0.4 },
+    { t: "Gateway", x: "-18%", y: "44%", d: 0.8 },
+    { t: "Ingress", x: "96%", y: "38%", d: 1.2 },
+    { t: "Worker Node", x: "-10%", y: "78%", d: 1.6 },
+    { t: "Scheduler", x: "94%", y: "70%", d: 2.0 },
+    { t: "Telemetry", x: "-22%", y: "96%", d: 2.4 },
+    { t: "Healthy", x: "90%", y: "100%", d: 2.8 },
+  ];
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 -z-[5] hidden lg:block">
+      {labels.map((l) => (
+        <motion.div
+          key={l.t}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: [0, -6, 0] }}
+          transition={{
+            opacity: { duration: 0.8, delay: l.d * 0.3 + 0.4 },
+            y: { duration: 6 + l.d, repeat: Infinity, ease: "easeInOut" },
+          }}
+          style={{ left: l.x, top: l.y }}
+          className="absolute flex items-center gap-1.5 rounded-full hairline glass px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
+        >
+          <span className="h-1 w-1 rounded-full bg-primary shadow-[0_0_8px_oklch(0.7_0.18_240/_90%)]" />
+          {l.t}
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+/* ---------- PILLAR HOVER EFFECT ---------- */
+function PillarHoverFx() {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 300 200"
+      preserveAspectRatio="none"
+      className="pointer-events-none absolute inset-0 h-full w-full text-primary opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+    >
+      <defs>
+        <linearGradient id="ph-ln" x1="0" x2="1">
+          <stop offset="0" stopColor="currentColor" stopOpacity="0" />
+          <stop offset="0.5" stopColor="currentColor" stopOpacity="0.5" />
+          <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path id="ph-p" d="M20 170 C 90 140 180 60 280 30" fill="none" stroke="url(#ph-ln)" strokeWidth="1" />
+      <circle r="2" fill="currentColor">
+        <animateMotion dur="3.2s" repeatCount="indefinite"><mpath href="#ph-p" /></animateMotion>
+      </circle>
+      {[[40, 160], [120, 110], [220, 60]].map(([x, y], idx) => (
+        <g key={idx}>
+          <circle cx={x} cy={y} r="2.5" fill="currentColor" opacity="0.85" />
+          <circle cx={x} cy={y} r="6" fill="none" stroke="currentColor" strokeOpacity="0.5">
+            <animate attributeName="r" values="2.5;10;2.5" dur="2.6s" begin={`${idx * 0.4}s`} repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.6;0;0.6" dur="2.6s" begin={`${idx * 0.4}s`} repeatCount="indefinite" />
+          </circle>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
 function Nav() {
   const links = [
     { label: "Domains", href: "#domains" },
