@@ -1918,6 +1918,50 @@ function SectionMini({ label }: { label: string }) {
 /*                        CONTACT                               */
 /* ============================================================ */
 function Contact() {
+  return ContactInner();
+}
+function ContactParticles() {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 1200 600"
+      preserveAspectRatio="xMidYMid slice"
+      className="absolute inset-0 h-full w-full text-primary"
+      style={{
+        maskImage: "radial-gradient(ellipse 70% 60% at 50% 50%, black 30%, transparent 90%)",
+        WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 50%, black 30%, transparent 90%)",
+        opacity: 0.35,
+      }}
+    >
+      <defs>
+        <linearGradient id="ct-ln" x1="0" x2="1">
+          <stop offset="0" stopColor="currentColor" stopOpacity="0" />
+          <stop offset="0.5" stopColor="currentColor" stopOpacity="0.5" />
+          <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      {[100, 220, 380, 500].map((y, i) => (
+        <g key={y}>
+          <path id={`ct-p-${i}`} d={`M0 ${y} C 300 ${y - 40} 900 ${y + 40} 1200 ${y}`} fill="none" stroke="url(#ct-ln)" strokeWidth="0.8" />
+          <circle r="1.6" fill="currentColor">
+            <animateMotion dur={`${9 + i * 1.6}s`} repeatCount="indefinite"><mpath href={`#ct-p-${i}`} /></animateMotion>
+            <animate attributeName="opacity" values="0;0.9;0" dur={`${9 + i * 1.6}s`} repeatCount="indefinite" />
+          </circle>
+        </g>
+      ))}
+      {[[200,180],[420,120],[760,260],[980,200],[300,420],[680,460],[900,380]].map(([x,y],i)=>(
+        <g key={i}>
+          <circle cx={x} cy={y} r="1.4" fill="currentColor" opacity="0.85" />
+          <circle cx={x} cy={y} r="5" fill="none" stroke="currentColor" strokeOpacity="0.4">
+            <animate attributeName="r" values="1.4;10;1.4" dur={`${4 + (i % 3)}s`} repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.5;0;0.5" dur={`${4 + (i % 3)}s`} repeatCount="indefinite" />
+          </circle>
+        </g>
+      ))}
+    </svg>
+  );
+}
+function ContactInner() {
   return (
     <section id="contact" className="section-pad relative overflow-hidden border-t border-hairline">
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
