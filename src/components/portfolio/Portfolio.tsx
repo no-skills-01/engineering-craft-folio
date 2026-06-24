@@ -51,6 +51,34 @@ function Nav() {
     { label: "Certifications", href: "#certs" },
     { label: "Contact", href: "#contact" },
   ];
+  const [scrolled, setScrolled] = useState(false);
+  const [active, setActive] = useState<string>("top");
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const ids = ["top", "domains", "projects", "stack", "certs", "contact"];
+    const els = ids
+      .map((id) => document.getElementById(id))
+      .filter((e): e is HTMLElement => !!e);
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible?.target.id) setActive(visible.target.id);
+      },
+      { rootMargin: "-40% 0px -55% 0px", threshold: [0, 0.25, 0.6, 1] },
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -58,7 +86,13 @@ function Nav() {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="fixed inset-x-0 top-0 z-50"
     >
-      <div className="mx-auto mt-4 flex max-w-6xl items-center justify-between gap-4 rounded-full glass hairline px-4 py-2 sm:px-5">
+      <div
+        className={`mx-auto mt-4 flex max-w-6xl items-center justify-between gap-4 rounded-full hairline px-4 py-2 transition-[background,backdrop-filter,box-shadow] duration-300 sm:px-5 ${
+          scrolled
+            ? "glass bg-background/70 shadow-[0_8px_40px_-20px_oklch(0_0_0/_70%)] [backdrop-filter:blur(22px)_saturate(160%)]"
+            : "glass"
+        }`}
+      >
         <a href="#top" className="flex items-center gap-2.5 pl-1.5">
           <span className="grid h-7 w-7 place-items-center rounded-full bg-primary/15 text-primary font-display text-sm font-bold">
             DA
@@ -68,15 +102,30 @@ function Nav() {
           </span>
         </a>
         <nav className="hidden items-center gap-1 md:flex">
-          {links.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="rounded-full px-3 py-1.5 text-[13px] text-muted-foreground transition hover:bg-secondary hover:text-foreground"
-            >
-              {l.label}
-            </a>
-          ))}
+          {links.map((l) => {
+            const id = l.href.slice(1);
+            const isActive = active === id;
+            return (
+              <a
+                key={l.href}
+                href={l.href}
+                className={`relative rounded-full px-3 py-1.5 text-[13px] transition ${
+                  isActive
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {isActive && (
+                  <motion.span
+                    layoutId="nav-active"
+                    className="absolute inset-0 -z-10 rounded-full bg-primary/15 ring-1 ring-inset ring-primary/25"
+                    transition={{ type: "spring", stiffness: 320, damping: 30 }}
+                  />
+                )}
+                {l.label}
+              </a>
+            );
+          })}
         </nav>
         <a
           href="#contact"
@@ -121,7 +170,7 @@ function Hero() {
                 <span className="h-1.5 w-1.5 rounded-full bg-primary" />
               </span>
               <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                Available for cloud & platform roles
+                Available for cloud · DevOps · SRE roles
               </span>
             </motion.div>
 
@@ -136,7 +185,7 @@ function Hero() {
               variants={fade}
               className="-mt-2 font-mono text-[clamp(0.78rem,1.05vw,0.95rem)] uppercase tracking-[0.28em] text-muted-foreground"
             >
-              <span className="text-primary">Cloud</span> · DevOps · <span className="text-primary">Platform</span> Engineer
+              <span className="text-primary">Cloud</span> · DevOps · <span className="text-primary">SRE</span> · MLOps
             </motion.p>
 
             <motion.p variants={fade} className="max-w-xl font-display text-2xl italic leading-snug text-foreground/90 sm:text-[1.6rem]">
@@ -144,10 +193,9 @@ function Hero() {
             </motion.p>
 
             <motion.p variants={fade} className="max-w-xl text-balance text-base leading-relaxed text-muted-foreground sm:text-lg">
-              I design and ship the unseen layer beneath modern software — production-inspired
-              cloud platforms, IaC, DevSecOps pipelines, Kubernetes and MLOps systems built with
-              the discipline of platform engineering: golden paths, secure defaults, and developer
-              experience as a first-class product surface.
+              I design and operate the unseen layer beneath modern software — cloud-native
+              infrastructure, Kubernetes workloads, DevSecOps pipelines and MLOps systems —
+              built for reliability, observability and automation at scale.
             </motion.p>
 
             <motion.div variants={fade} className="flex flex-wrap items-center gap-3 pt-1">
@@ -185,6 +233,7 @@ function Hero() {
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
             className="relative mx-auto w-full max-w-md lg:mx-0 lg:mt-2"
           >
+            <FloatingLabels />
             {/* soft glow */}
             <div aria-hidden className="absolute -inset-8 -z-10 rounded-[2.5rem] bg-primary/25 blur-3xl" />
             <div aria-hidden className="absolute -inset-1 -z-10 rounded-[2rem] bg-gradient-to-br from-primary/40 via-accent/20 to-transparent blur-md" />
@@ -225,7 +274,7 @@ function Philosophy() {
     { icon: ShieldCheck, k: "Reliable", t: "Designed for failure: SLOs, error budgets, graceful degradation by default." },
     { icon: Eye, k: "Observable", t: "Metrics, logs and traces unified — you cannot operate what you cannot see." },
     { icon: Cloud, k: "Cloud Native", t: "Loosely coupled, declarative, elastic — built to live on Kubernetes." },
-    { icon: Boxes, k: "Platform", t: "Golden paths and paved roads — developer experience as a product surface." },
+    { icon: Boxes, k: "Resilient", t: "Self-healing workloads, autoscaling, blast-radius containment by design." },
     { icon: Zap, k: "Operational", t: "Runbooks, on-call hygiene, post-mortems — excellence is a daily practice." },
   ];
   return (
@@ -257,13 +306,16 @@ function Philosophy() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.5, delay: i * 0.05 }}
-              className="group relative bg-background p-7 transition hover:bg-surface/60"
+              className="group relative overflow-hidden bg-background p-7 transition hover:bg-surface/60"
             >
+              <PillarHoverFx />
               <div className="flex items-center gap-3">
-                <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary">
+                <div className="relative grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary transition group-hover:bg-primary/20 group-hover:shadow-[0_0_24px_-4px_oklch(0.7_0.18_240/_70%)]">
                   <p.icon className="h-4 w-4" />
+                  <span className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-primary/30 opacity-0 transition group-hover:opacity-100" />
                 </div>
                 <span className="font-display text-lg font-semibold tracking-tight">{p.k}</span>
+                <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary/40 transition group-hover:bg-primary group-hover:shadow-[0_0_10px_oklch(0.7_0.18_240/_90%)]" />
               </div>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.t}</p>
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 transition group-hover:opacity-100" />
@@ -855,15 +907,15 @@ function About() {
         >
           <motion.p variants={fade} className="font-display text-balance text-3xl font-medium leading-tight tracking-tight sm:text-4xl">
             I design and ship the <span className="text-primary">unseen layer</span> beneath modern
-            software — the platforms, pipelines and infrastructure that turn ideas into production.
+            software — the infrastructure, pipelines and runtimes that turn ideas into production.
           </motion.p>
           <motion.p variants={fade} className="max-w-2xl text-balance text-base text-muted-foreground sm:text-lg">
             My work lives at the intersection of <em className="not-italic text-foreground/90">Cloud Architecture, Infrastructure as Code, Kubernetes, DevSecOps, MLOps and Observability</em>.
             I build reference-grade systems — small enough to read end-to-end, serious enough to run real workloads.
           </motion.p>
           <motion.p variants={fade} className="max-w-2xl text-balance text-base text-muted-foreground sm:text-lg">
-            Lately I have been obsessed with the discipline of platform engineering: golden paths, paved roads,
-            secure defaults, and developer experience as a first-class product surface.
+            Lately I have been obsessed with reliability engineering: SLOs, error budgets, graceful
+            degradation, and the operational discipline that keeps cloud-native systems healthy under load.
           </motion.p>
         </motion.div>
       </div>
@@ -1555,7 +1607,7 @@ function Contact() {
           </span>
         </h2>
         <p className="mx-auto mt-5 max-w-lg text-base text-muted-foreground">
-          Open to platform, cloud, DevOps and SRE conversations. The fastest way to reach me is email.
+          Open to cloud, DevOps, SRE and MLOps conversations. The fastest way to reach me is email.
         </p>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
@@ -1608,8 +1660,22 @@ function Footer() {
 /*                        ROOT                                  */
 /* ============================================================ */
 export default function Portfolio() {
+  const [booting, setBooting] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return !sessionStorage.getItem("da:boot");
+  });
+  useEffect(() => {
+    if (!booting) return;
+    const t = setTimeout(() => {
+      sessionStorage.setItem("da:boot", "1");
+      setBooting(false);
+    }, 2600);
+    return () => clearTimeout(t);
+  }, [booting]);
+
   return (
     <main className="relative min-h-screen bg-background text-foreground antialiased">
+      {booting && <BootSequence />}
       <AmbientTopology />
       <Nav />
       <Hero />
