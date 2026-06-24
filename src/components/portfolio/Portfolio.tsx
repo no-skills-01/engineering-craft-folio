@@ -1080,13 +1080,14 @@ function SectionLabel({ index, title }: { index: string; title: string }) {
 /* ============================================================ */
 function Domains() {
   const domains = [
-    { icon: Cloud, name: "Cloud Architecture", desc: "Well-architected, multi-account AWS landing zones with cost and security baselines.", tag: "Design" },
+    { icon: Cloud, name: "Cloud Architecture", desc: "Multi-cloud landing zones, network topology, cost and security baselines.", tag: "Design" },
     { icon: Boxes, name: "Infrastructure as Code", desc: "Reusable Terraform modules, GitOps workflows, drift-free environments.", tag: "Automate" },
-    { icon: Container, name: "Cloud Native", desc: "Kubernetes, Helm, service mesh, progressive delivery with Argo.", tag: "Run" },
+    { icon: Container, name: "Containers", desc: "Kubernetes, Helm, service mesh, progressive delivery with Argo.", tag: "Run" },
     { icon: ShieldCheck, name: "DevSecOps", desc: "Shift-left security, SAST, SCA, secrets scanning and policy as code.", tag: "Secure" },
-    { icon: Brain, name: "MLOps", desc: "Model registries, reproducible pipelines, KServe-based serving.", tag: "Ship" },
     { icon: Activity, name: "Observability", desc: "Metrics, logs and traces unified with OpenTelemetry and Grafana.", tag: "See" },
+    { icon: Brain, name: "MLOps", desc: "Model registries, reproducible pipelines, KServe-based serving.", tag: "Ship" },
   ];
+  const [active, setActive] = useState<number | null>(null);
 
   return (
     <section id="domains" className="section-pad relative overflow-hidden">
@@ -1103,63 +1104,76 @@ function Domains() {
               <span className="text-muted-foreground">One operating model.</span>
             </h2>
             <p className="mt-4 max-w-md text-sm text-muted-foreground">
-              Every domain feeds the next — from how infrastructure is described, to how it is secured,
-              observed and evolved.
+              Every domain feeds the next — a connected pipeline from design through deployment,
+              security, observation and intelligence.
             </p>
           </div>
 
-          {/* Constellation layout */}
+          {/* Connected pipeline layout */}
           <div className="md:col-span-8">
-            <div className="relative">
-              {/* connector svg */}
-              <svg
-                aria-hidden
-                viewBox="0 0 800 600"
-                className="pointer-events-none absolute inset-0 h-full w-full opacity-50"
-              >
-                <defs>
-                  <linearGradient id="ln" x1="0" x2="1">
-                    <stop offset="0" stopColor="currentColor" stopOpacity="0" />
-                    <stop offset="0.5" stopColor="currentColor" stopOpacity="0.6" />
-                    <stop offset="1" stopColor="currentColor" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <g className="text-primary" stroke="url(#ln)" strokeWidth="1" fill="none">
-                  <path d="M120,90 C300,150 500,150 680,90" />
-                  <path d="M120,300 C300,260 500,260 680,300" />
-                  <path d="M120,510 C300,460 500,460 680,510" />
-                  <path d="M120,90 C200,300 200,300 120,510" />
-                  <path d="M680,90 C600,300 600,300 680,510" />
-                </g>
-              </svg>
-
-              <div className="relative grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {domains.map((d, i) => (
-                  <motion.div
+            <ol className="relative grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {domains.map((d, i) => {
+                const isActive = active === i;
+                const isLinked = active !== null && (active === i - 1 || active === i + 1);
+                return (
+                  <motion.li
                     key={d.name}
                     initial={{ opacity: 0, y: 16 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-60px" }}
                     transition={{ duration: 0.5, delay: i * 0.06 }}
-                    className={`group relative overflow-hidden rounded-2xl hairline bg-surface/70 p-5 transition hover:bg-surface-elevated ${
-                      i % 3 === 0 ? "sm:translate-y-3" : i % 3 === 2 ? "sm:-translate-y-3" : ""
+                    onMouseEnter={() => setActive(i)}
+                    onMouseLeave={() => setActive(null)}
+                    className={`group relative overflow-hidden rounded-2xl hairline bg-surface/70 p-5 transition-all duration-500 ${
+                      isActive
+                        ? "bg-surface-elevated shadow-[0_0_40px_-10px_oklch(0.7_0.18_240/_60%)] ring-1 ring-primary/40"
+                        : isLinked
+                          ? "bg-surface ring-1 ring-primary/20"
+                          : "hover:bg-surface-elevated"
                     }`}
                   >
+                    {/* connector arrow to next */}
+                    {i < domains.length - 1 && (
+                      <span
+                        aria-hidden
+                        className={`absolute -right-2 top-1/2 z-10 hidden -translate-y-1/2 font-mono text-[10px] transition sm:inline ${
+                          isActive || active === i + 1 ? "text-primary" : "text-primary/40"
+                        }`}
+                      >
+                        {i % 2 === 0 ? "→" : "↓"}
+                      </span>
+                    )}
                     <div className="flex items-center justify-between">
-                      <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+                      <div className={`relative grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary transition ${isActive ? "bg-primary/25 shadow-[0_0_24px_-4px_oklch(0.7_0.18_240/_80%)]" : ""}`}>
                         <d.icon className="h-5 w-5" />
                       </div>
-                      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                        {d.tag}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                          step · 0{i + 1}
+                        </span>
+                        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary/80">
+                          {d.tag}
+                        </span>
+                      </div>
                     </div>
                     <h3 className="mt-4 font-display text-lg font-semibold tracking-tight">{d.name}</h3>
                     <p className="mt-1.5 text-sm text-muted-foreground">{d.desc}</p>
-                    <div className="pointer-events-none absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 transition group-hover:opacity-100" />
-                  </motion.div>
-                ))}
-              </div>
-            </div>
+                    {/* flowing packet on hover */}
+                    <svg
+                      aria-hidden
+                      viewBox="0 0 300 80"
+                      preserveAspectRatio="none"
+                      className={`pointer-events-none mt-4 h-6 w-full text-primary transition-opacity duration-500 ${isActive || isLinked ? "opacity-100" : "opacity-30"}`}
+                    >
+                      <path id={`dm-p-${i}`} d="M0 40 C 80 10 220 70 300 40" fill="none" stroke="currentColor" strokeOpacity="0.45" strokeWidth="0.8" strokeDasharray="2 4" />
+                      <circle r="1.8" fill="currentColor">
+                        <animateMotion dur="3.5s" repeatCount="indefinite"><mpath href={`#dm-p-${i}`} /></animateMotion>
+                      </circle>
+                    </svg>
+                  </motion.li>
+                );
+              })}
+            </ol>
           </div>
         </div>
       </div>
