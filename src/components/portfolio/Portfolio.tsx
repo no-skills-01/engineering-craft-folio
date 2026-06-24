@@ -1548,13 +1548,20 @@ function Stack() {
               {groups.map((g, i) => (
                 <motion.div
                   key={g.name}
-                  initial={{ opacity: 0, y: 12 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.04 }}
-                  className="group grid grid-cols-[120px_1fr] items-baseline gap-6 py-5 sm:grid-cols-[180px_1fr]"
+                  initial={{ opacity: 0, x: -12 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.55, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] }}
+                  className="group relative grid grid-cols-[120px_1fr] items-center gap-6 py-5 transition-colors sm:grid-cols-[200px_1fr] hover:bg-surface/40"
                 >
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute left-0 top-1/2 h-px w-0 -translate-y-1/2 bg-gradient-to-r from-primary via-primary/40 to-transparent transition-all duration-500 group-hover:w-full"
+                  />
                   <div className="flex items-center gap-3">
+                    <span className="grid h-7 w-7 place-items-center rounded-md bg-primary/10 text-primary transition group-hover:bg-primary/20 group-hover:shadow-[0_0_18px_-2px_oklch(0.7_0.18_240/_80%)]">
+                      <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                    </span>
                     <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                       0{i + 1}
                     </span>
@@ -1562,12 +1569,13 @@ function Stack() {
                   </div>
                   <div className="flex flex-wrap gap-x-5 gap-y-2">
                     {g.items.map((it) => (
-                      <span
+                      <motion.span
                         key={it}
-                        className="text-base text-foreground/80 transition group-hover:text-foreground"
+                        whileHover={{ y: -1 }}
+                        className="rounded-full px-1 text-base text-foreground/80 transition hover:text-primary group-hover:text-foreground"
                       >
                         {it}
-                      </span>
+                      </motion.span>
                     ))}
                   </div>
                 </motion.div>
