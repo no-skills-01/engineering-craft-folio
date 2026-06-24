@@ -1921,7 +1921,8 @@ function Contact() {
   return (
     <section id="contact" className="section-pad relative overflow-hidden border-t border-hairline">
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/2 top-1/2 h-[800px] w-[1200px] -translate-x-1/2 -translate-y-1/2 amber-glow" />
+        <div className="absolute left-1/2 top-1/2 h-[800px] w-[1200px] -translate-x-1/2 -translate-y-1/2 amber-glow opacity-70" />
+        <ContactParticles />
       </div>
       <div className="mx-auto max-w-4xl px-6 text-center">
         <SectionLabel index="07" title="Contact" />
