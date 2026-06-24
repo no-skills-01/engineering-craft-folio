@@ -1320,6 +1320,15 @@ function ProjectRow({ p, i, featured = false }: { p: Project; i: number; feature
                 {p.kicker}
               </span>
             </div>
+            <div className="absolute right-5 top-5 flex items-center gap-2 rounded-full hairline bg-background/60 px-3 py-1.5 backdrop-blur">
+              <span className="relative grid h-2 w-2 place-items-center">
+                <span className="absolute h-2 w-2 animate-ping rounded-full bg-primary/50" />
+                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                Interactive Infrastructure View · Coming soon
+              </span>
+            </div>
             <div className="absolute inset-x-0 bottom-0 grid grid-cols-1 gap-6 p-6 md:grid-cols-12 md:gap-10 md:p-10">
               <div className="md:col-span-7">
                 <h3 className="font-display text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl md:text-5xl">
@@ -1385,6 +1394,12 @@ function ProjectRow({ p, i, featured = false }: { p: Project; i: number; feature
             <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full glass hairline px-2.5 py-1">
               <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                 {p.kicker}
+              </span>
+            </div>
+            <div className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full hairline bg-background/55 px-2.5 py-1 backdrop-blur">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                Architecture diagram · soon
               </span>
             </div>
           </div>
