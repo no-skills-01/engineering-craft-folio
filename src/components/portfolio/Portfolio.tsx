@@ -43,6 +43,148 @@ const stagger: Variants = {
 /* ============================================================ */
 /*                         NAV                                  */
 /* ============================================================ */
+/* ---------- BOOT SEQUENCE ---------- */
+function BootSequence() {
+  const steps = [
+    "Initializing infrastructure",
+    "Loading configuration",
+    "Starting control plane",
+    "Scheduling workloads",
+    "Provisioning containers",
+    "Deploying services",
+    "Collecting telemetry",
+    "Cluster status: ready",
+  ];
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setI((p) => Math.min(p + 1, steps.length - 1)), 280);
+    return () => clearInterval(id);
+  }, [steps.length]);
+  const progress = ((i + 1) / steps.length) * 100;
+  return (
+    <motion.div
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="fixed inset-0 z-[100] grid place-items-center bg-background"
+    >
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/15 blur-[140px]" />
+      </div>
+      <div className="relative w-full max-w-md px-6">
+        <div className="flex items-center gap-3">
+          <span className="grid h-9 w-9 place-items-center rounded-full bg-primary/15 text-primary font-display text-sm font-bold">
+            DA
+          </span>
+          <div className="font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+            cluster · bootstrap
+          </div>
+        </div>
+        <div className="mt-8 h-px w-full overflow-hidden rounded-full bg-hairline">
+          <motion.div
+            className="h-full bg-primary shadow-[0_0_20px_oklch(0.7_0.18_240/_80%)]"
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+          />
+        </div>
+        <ul className="mt-6 space-y-1.5 font-mono text-[12px] leading-relaxed">
+          {steps.slice(0, i + 1).map((s, idx) => {
+            const done = idx < i || i === steps.length - 1;
+            return (
+              <motion.li
+                key={s}
+                initial={{ opacity: 0, x: -6 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-center gap-2"
+              >
+                <span
+                  className={`inline-block h-1.5 w-1.5 rounded-full ${
+                    done ? "bg-primary shadow-[0_0_8px_oklch(0.7_0.18_240/_90%)]" : "bg-primary/40"
+                  }`}
+                />
+                <span className={done ? "text-foreground/85" : "text-muted-foreground"}>
+                  {s}
+                  {!done && idx === i && <span className="ml-1 animate-pulse text-primary">…</span>}
+                  {done && idx === steps.length - 1 && (
+                    <span className="ml-2 text-primary">✓</span>
+                  )}
+                </span>
+              </motion.li>
+            );
+          })}
+        </ul>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ---------- FLOATING HERO LABELS ---------- */
+function FloatingLabels() {
+  const labels = [
+    { t: "Control Plane", x: "-12%", y: "8%", d: 0 },
+    { t: "Cluster Ready", x: "92%", y: "4%", d: 0.4 },
+    { t: "Gateway", x: "-18%", y: "44%", d: 0.8 },
+    { t: "Ingress", x: "96%", y: "38%", d: 1.2 },
+    { t: "Worker Node", x: "-10%", y: "78%", d: 1.6 },
+    { t: "Scheduler", x: "94%", y: "70%", d: 2.0 },
+    { t: "Telemetry", x: "-22%", y: "96%", d: 2.4 },
+    { t: "Healthy", x: "90%", y: "100%", d: 2.8 },
+  ];
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 -z-[5] hidden lg:block">
+      {labels.map((l) => (
+        <motion.div
+          key={l.t}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: [0, -6, 0] }}
+          transition={{
+            opacity: { duration: 0.8, delay: l.d * 0.3 + 0.4 },
+            y: { duration: 6 + l.d, repeat: Infinity, ease: "easeInOut" },
+          }}
+          style={{ left: l.x, top: l.y }}
+          className="absolute flex items-center gap-1.5 rounded-full hairline glass px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
+        >
+          <span className="h-1 w-1 rounded-full bg-primary shadow-[0_0_8px_oklch(0.7_0.18_240/_90%)]" />
+          {l.t}
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+/* ---------- PILLAR HOVER EFFECT ---------- */
+function PillarHoverFx() {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 300 200"
+      preserveAspectRatio="none"
+      className="pointer-events-none absolute inset-0 h-full w-full text-primary opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+    >
+      <defs>
+        <linearGradient id="ph-ln" x1="0" x2="1">
+          <stop offset="0" stopColor="currentColor" stopOpacity="0" />
+          <stop offset="0.5" stopColor="currentColor" stopOpacity="0.5" />
+          <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path id="ph-p" d="M20 170 C 90 140 180 60 280 30" fill="none" stroke="url(#ph-ln)" strokeWidth="1" />
+      <circle r="2" fill="currentColor">
+        <animateMotion dur="3.2s" repeatCount="indefinite"><mpath href="#ph-p" /></animateMotion>
+      </circle>
+      {[[40, 160], [120, 110], [220, 60]].map(([x, y], idx) => (
+        <g key={idx}>
+          <circle cx={x} cy={y} r="2.5" fill="currentColor" opacity="0.85" />
+          <circle cx={x} cy={y} r="6" fill="none" stroke="currentColor" strokeOpacity="0.5">
+            <animate attributeName="r" values="2.5;10;2.5" dur="2.6s" begin={`${idx * 0.4}s`} repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.6;0;0.6" dur="2.6s" begin={`${idx * 0.4}s`} repeatCount="indefinite" />
+          </circle>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
 function Nav() {
   const links = [
     { label: "Domains", href: "#domains" },
@@ -51,6 +193,34 @@ function Nav() {
     { label: "Certifications", href: "#certs" },
     { label: "Contact", href: "#contact" },
   ];
+  const [scrolled, setScrolled] = useState(false);
+  const [active, setActive] = useState<string>("top");
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const ids = ["top", "domains", "projects", "stack", "certs", "contact"];
+    const els = ids
+      .map((id) => document.getElementById(id))
+      .filter((e): e is HTMLElement => !!e);
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible?.target.id) setActive(visible.target.id);
+      },
+      { rootMargin: "-40% 0px -55% 0px", threshold: [0, 0.25, 0.6, 1] },
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -58,7 +228,13 @@ function Nav() {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="fixed inset-x-0 top-0 z-50"
     >
-      <div className="mx-auto mt-4 flex max-w-6xl items-center justify-between gap-4 rounded-full glass hairline px-4 py-2 sm:px-5">
+      <div
+        className={`mx-auto mt-4 flex max-w-6xl items-center justify-between gap-4 rounded-full hairline px-4 py-2 transition-[background,backdrop-filter,box-shadow] duration-300 sm:px-5 ${
+          scrolled
+            ? "glass bg-background/70 shadow-[0_8px_40px_-20px_oklch(0_0_0/_70%)] [backdrop-filter:blur(22px)_saturate(160%)]"
+            : "glass"
+        }`}
+      >
         <a href="#top" className="flex items-center gap-2.5 pl-1.5">
           <span className="grid h-7 w-7 place-items-center rounded-full bg-primary/15 text-primary font-display text-sm font-bold">
             DA
@@ -68,15 +244,30 @@ function Nav() {
           </span>
         </a>
         <nav className="hidden items-center gap-1 md:flex">
-          {links.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="rounded-full px-3 py-1.5 text-[13px] text-muted-foreground transition hover:bg-secondary hover:text-foreground"
-            >
-              {l.label}
-            </a>
-          ))}
+          {links.map((l) => {
+            const id = l.href.slice(1);
+            const isActive = active === id;
+            return (
+              <a
+                key={l.href}
+                href={l.href}
+                className={`relative rounded-full px-3 py-1.5 text-[13px] transition ${
+                  isActive
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {isActive && (
+                  <motion.span
+                    layoutId="nav-active"
+                    className="absolute inset-0 -z-10 rounded-full bg-primary/15 ring-1 ring-inset ring-primary/25"
+                    transition={{ type: "spring", stiffness: 320, damping: 30 }}
+                  />
+                )}
+                {l.label}
+              </a>
+            );
+          })}
         </nav>
         <a
           href="#contact"
@@ -121,7 +312,7 @@ function Hero() {
                 <span className="h-1.5 w-1.5 rounded-full bg-primary" />
               </span>
               <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                Available for cloud & platform roles
+                Available for cloud · DevOps · SRE roles
               </span>
             </motion.div>
 
@@ -136,7 +327,7 @@ function Hero() {
               variants={fade}
               className="-mt-2 font-mono text-[clamp(0.78rem,1.05vw,0.95rem)] uppercase tracking-[0.28em] text-muted-foreground"
             >
-              <span className="text-primary">Cloud</span> · DevOps · <span className="text-primary">Platform</span> Engineer
+              <span className="text-primary">Cloud</span> · DevOps · <span className="text-primary">SRE</span> · MLOps
             </motion.p>
 
             <motion.p variants={fade} className="max-w-xl font-display text-2xl italic leading-snug text-foreground/90 sm:text-[1.6rem]">
@@ -144,10 +335,9 @@ function Hero() {
             </motion.p>
 
             <motion.p variants={fade} className="max-w-xl text-balance text-base leading-relaxed text-muted-foreground sm:text-lg">
-              I design and ship the unseen layer beneath modern software — production-inspired
-              cloud platforms, IaC, DevSecOps pipelines, Kubernetes and MLOps systems built with
-              the discipline of platform engineering: golden paths, secure defaults, and developer
-              experience as a first-class product surface.
+              I design and operate the unseen layer beneath modern software — cloud-native
+              infrastructure, Kubernetes workloads, DevSecOps pipelines and MLOps systems —
+              built for reliability, observability and automation at scale.
             </motion.p>
 
             <motion.div variants={fade} className="flex flex-wrap items-center gap-3 pt-1">
@@ -185,6 +375,7 @@ function Hero() {
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
             className="relative mx-auto w-full max-w-md lg:mx-0 lg:mt-2"
           >
+            <FloatingLabels />
             {/* soft glow */}
             <div aria-hidden className="absolute -inset-8 -z-10 rounded-[2.5rem] bg-primary/25 blur-3xl" />
             <div aria-hidden className="absolute -inset-1 -z-10 rounded-[2rem] bg-gradient-to-br from-primary/40 via-accent/20 to-transparent blur-md" />
@@ -225,7 +416,7 @@ function Philosophy() {
     { icon: ShieldCheck, k: "Reliable", t: "Designed for failure: SLOs, error budgets, graceful degradation by default." },
     { icon: Eye, k: "Observable", t: "Metrics, logs and traces unified — you cannot operate what you cannot see." },
     { icon: Cloud, k: "Cloud Native", t: "Loosely coupled, declarative, elastic — built to live on Kubernetes." },
-    { icon: Boxes, k: "Platform", t: "Golden paths and paved roads — developer experience as a product surface." },
+    { icon: Boxes, k: "Resilient", t: "Self-healing workloads, autoscaling, blast-radius containment by design." },
     { icon: Zap, k: "Operational", t: "Runbooks, on-call hygiene, post-mortems — excellence is a daily practice." },
   ];
   return (
@@ -257,13 +448,16 @@ function Philosophy() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.5, delay: i * 0.05 }}
-              className="group relative bg-background p-7 transition hover:bg-surface/60"
+              className="group relative overflow-hidden bg-background p-7 transition hover:bg-surface/60"
             >
+              <PillarHoverFx />
               <div className="flex items-center gap-3">
-                <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary">
+                <div className="relative grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary transition group-hover:bg-primary/20 group-hover:shadow-[0_0_24px_-4px_oklch(0.7_0.18_240/_70%)]">
                   <p.icon className="h-4 w-4" />
+                  <span className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-primary/30 opacity-0 transition group-hover:opacity-100" />
                 </div>
                 <span className="font-display text-lg font-semibold tracking-tight">{p.k}</span>
+                <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary/40 transition group-hover:bg-primary group-hover:shadow-[0_0_10px_oklch(0.7_0.18_240/_90%)]" />
               </div>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.t}</p>
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 transition group-hover:opacity-100" />
@@ -855,15 +1049,15 @@ function About() {
         >
           <motion.p variants={fade} className="font-display text-balance text-3xl font-medium leading-tight tracking-tight sm:text-4xl">
             I design and ship the <span className="text-primary">unseen layer</span> beneath modern
-            software — the platforms, pipelines and infrastructure that turn ideas into production.
+            software — the infrastructure, pipelines and runtimes that turn ideas into production.
           </motion.p>
           <motion.p variants={fade} className="max-w-2xl text-balance text-base text-muted-foreground sm:text-lg">
             My work lives at the intersection of <em className="not-italic text-foreground/90">Cloud Architecture, Infrastructure as Code, Kubernetes, DevSecOps, MLOps and Observability</em>.
             I build reference-grade systems — small enough to read end-to-end, serious enough to run real workloads.
           </motion.p>
           <motion.p variants={fade} className="max-w-2xl text-balance text-base text-muted-foreground sm:text-lg">
-            Lately I have been obsessed with the discipline of platform engineering: golden paths, paved roads,
-            secure defaults, and developer experience as a first-class product surface.
+            Lately I have been obsessed with reliability engineering: SLOs, error budgets, graceful
+            degradation, and the operational discipline that keeps cloud-native systems healthy under load.
           </motion.p>
         </motion.div>
       </div>
@@ -1555,7 +1749,7 @@ function Contact() {
           </span>
         </h2>
         <p className="mx-auto mt-5 max-w-lg text-base text-muted-foreground">
-          Open to platform, cloud, DevOps and SRE conversations. The fastest way to reach me is email.
+          Open to cloud, DevOps, SRE and MLOps conversations. The fastest way to reach me is email.
         </p>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
@@ -1608,8 +1802,22 @@ function Footer() {
 /*                        ROOT                                  */
 /* ============================================================ */
 export default function Portfolio() {
+  const [booting, setBooting] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return !sessionStorage.getItem("da:boot");
+  });
+  useEffect(() => {
+    if (!booting) return;
+    const t = setTimeout(() => {
+      sessionStorage.setItem("da:boot", "1");
+      setBooting(false);
+    }, 2600);
+    return () => clearTimeout(t);
+  }, [booting]);
+
   return (
     <main className="relative min-h-screen bg-background text-foreground antialiased">
+      {booting && <BootSequence />}
       <AmbientTopology />
       <Nav />
       <Hero />
