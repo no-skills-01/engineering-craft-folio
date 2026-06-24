@@ -2010,17 +2010,51 @@ function ContactInner() {
 function Footer() {
   return (
     <footer className="border-t border-hairline">
-      <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 px-6 py-8 sm:flex-row sm:items-center">
-        <div className="flex items-center gap-2.5">
-          <span className="grid h-6 w-6 place-items-center rounded-full bg-primary/15 text-primary font-display text-xs font-bold">
-            DA
-          </span>
-          <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-            Darshan Atkari · © {new Date().getFullYear()}
-          </span>
+      <div className="mx-auto max-w-6xl px-6 py-12">
+        <div className="flex items-center gap-3 font-mono text-[12px]">
+          <span className="text-primary">❯</span>
+          <span className="text-foreground/85">kubectl get engineer</span>
+          <span className="ml-2 inline-block h-3.5 w-1 animate-pulse bg-primary" />
         </div>
-        <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-          Designed & engineered with intent.
+        <div className="mt-5 overflow-x-auto rounded-2xl hairline bg-surface/50">
+          <table className="w-full min-w-[640px] font-mono text-[12px]">
+            <thead>
+              <tr className="border-b border-hairline text-left text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                <th className="px-5 py-3 font-normal">NAME</th>
+                <th className="px-5 py-3 font-normal">STATUS</th>
+                <th className="px-5 py-3 font-normal">ROLE</th>
+                <th className="px-5 py-3 font-normal">AVAILABILITY</th>
+                <th className="px-5 py-3 font-normal">AGE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="text-foreground/85">
+                <td className="px-5 py-3">darshan-atkari</td>
+                <td className="px-5 py-3">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_oklch(0.7_0.18_240/_90%)]" />
+                    Ready
+                  </span>
+                </td>
+                <td className="px-5 py-3 text-muted-foreground">Cloud · DevOps · SRE · MLOps</td>
+                <td className="px-5 py-3 text-primary/90">Open to Opportunities</td>
+                <td className="px-5 py-3 text-muted-foreground">∞</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-6 flex flex-col items-start justify-between gap-3 text-[11px] sm:flex-row sm:items-center">
+          <div className="flex items-center gap-2.5">
+            <span className="grid h-6 w-6 place-items-center rounded-full bg-primary/15 text-primary font-display text-xs font-bold">
+              DA
+            </span>
+            <span className="font-mono uppercase tracking-[0.22em] text-muted-foreground">
+              Darshan Atkari · © {new Date().getFullYear()}
+            </span>
+          </div>
+          <div className="font-mono uppercase tracking-[0.22em] text-muted-foreground">
+            Designed &amp; engineered with intent.
+          </div>
         </div>
       </div>
     </footer>
